@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.navigation.NavigationView
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="?attr/actionBarSize"
+    tools:context=".user_profile.UserProfileActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:weightSum="10"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+    <RelativeLayout
+        android:layout_weight="7"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/user_profile_toolbar"
+            android:background="@color/blue_darkish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </androidx.appcompat.widget.Toolbar>
+
+     <include layout="@layout/top_user_profile"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_weight="3"
+        android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
+        android:layout_width="match_parent"
+        android:layout_margin="3dp"
+        android:layout_height="0dp">
+
+        <GridView
+            android:id="@+id/gridView"
+            android:numColumns="3"
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </GridView>
+
+    </RelativeLayout>
+    </LinearLayout>
+
+</com.google.android.material.navigation.NavigationView>

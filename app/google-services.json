@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "918280829113",
+    "firebase_url": "https://topyouth-6be44.firebaseio.com",
+    "project_id": "topyouth-6be44",
+    "storage_bucket": "topyouth-6be44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918280829113:android:4df2ac26d3a3a8700bc368",
+        "android_client_info": {
+          "package_name": "com.example.topyouth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918280829113-66dlld35b9s502gtrs1mf2mqkfsiu0l6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.topyouth",
+            "certificate_hash": "a236d68e0ec9d8857e08ee113159ae6a22b71f84"
+          }
+        },
+        {
+          "client_id": "918280829113-a498gghq56pd8oir3rqkm577fg6i0b48.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAE4QAqIcEkPerUY9XzKrGOwE83n3Xl4bw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918280829113-a498gghq56pd8oir3rqkm577fg6i0b48.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

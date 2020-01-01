@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background_blue"
+    android:weightSum="1"
+    tools:context=".login.LoginActivity">
+
+    <RelativeLayout
+        android:layout_weight=".5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/memberstext"
+                android:text="@string/memebers_login_here"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/white"
+                style="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textColor="@color/blue_darkish"
+                android:layout_marginTop="10dp"
+                android:textSize="16sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/email_field"
+                android:layout_below="@id/memberstext"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/edit_text_background"
+                android:padding="5dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:layout_width="match_parent"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:hint="@string/email"
+                android:textAlignment="center"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/pass_field"
+                android:layout_below="@id/email_field"
+                android:background="@drawable/edit_text_background"
+                android:hint="@string/password"
+                android:padding="5dp"
+                android:textAlignment="center"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="50dp"
+                android:onClick="onClick"
+                android:layout_marginEnd="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:text="@string/login"
+                android:id="@+id/loginButton"
+                android:textColor="@color/blue_darkish"
+                android:textAllCaps="false"
+                android:background="@drawable/button_design_selector_blue"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_below="@id/pass_field"
+                android:layout_marginStart="100dp"
+                android:layout_marginEnd="100dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="10dp"
+                android:elevation="4dp"
+                android:onClick="onClick"
+                 />
+
+            <TextView
+                android:id="@+id/forgot_pass"
+                android:text="@string/forgotten_password_click_here"
+                android:textStyle="bold|italic"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/loginButton"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_weight=".5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/registerTitl"
+                android:text="@string/new_member_register_here"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textColor="@color/blue_darkish"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/white"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:layout_below="@id/registerTitl"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:background="@drawable/edit_text_background"
+                android:hint="@string/type_in_your_email"
+                android:textAlignment="center"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:id="@+id/registerEmail_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </EditText>
+
+            <EditText
+                android:id="@+id/registerPass_field"
+                android:layout_marginTop="5dp"
+                android:hint="@string/type_in_your_password"
+                android:textAlignment="center"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:background="@drawable/edit_text_background"
+                android:padding="5dp"
+                android:layout_below="@id/registerEmail_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </EditText>
+
+            <EditText
+                android:id="@+id/registerCPass_field"
+                android:layout_marginTop="5dp"
+                android:hint="@string/confirm_your_password"
+                android:textAlignment="center"
+                android:layout_below="@id/registerPass_field"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:background="@drawable/edit_text_background"
+                android:padding="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </EditText>
+
+            <Button
+                android:id="@+id/registerButton"
+                android:text="@string/register"
+                android:textAllCaps="false"
+                android:layout_below="@id/registerCPass_field"
+                android:layout_centerHorizontal="true"
+                android:elevation="4dp"
+                android:background="@drawable/button_design_selector_blue"
+                android:textColor="@color/blue_darkish"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="100dp"
+                android:layout_marginEnd="100dp"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:onClick="onClick"
+                />
+
+    </RelativeLayout>
+
+</LinearLayout>
