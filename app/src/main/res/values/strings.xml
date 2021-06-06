@@ -7,8 +7,8 @@
     <string name="login">Login</string>
     <string name="confirm_your_password">Confirm your password</string>
     <string name="register">Register</string>
-    <string name="new_member_register_here">New member, register BELOW.</string>
-    <string name="memebers_login_here">Members, Login HERE.</string>
+    <string name="new_member_register_here">Create a new account and join us</string>
+    <string name="memebers_login_here">Members login</string>
     <string name="forgotten_password_click_here">Forgotten Password Click HERE</string>
     <string name="email">Email</string>
     <string name="home">Home</string>
@@ -16,4 +16,5 @@
     <string name="post">Post</string>
     <string name="sign_out">Sign out</string>
     <string name="user">user</string>
+    <string name="have_no_account">Have no account? Register here</string>
 </resources>

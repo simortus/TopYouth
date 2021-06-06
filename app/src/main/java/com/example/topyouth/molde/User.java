@@ -9,13 +9,22 @@ public class User implements  Serializable {
 
     private String userId, email,  username ,photo, about, profession;
 
-    public User(String userId, String email, String username, String photo, String about, String profession) {
+    public User(@NonNull String userId, @NonNull String email, @NonNull String username,
+                @NonNull String photo, @NonNull String about, @NonNull String profession) {
         this.userId = userId;
         this.email = email;
         this.username = username;
         this.photo = photo;
         this.about = about;
         this.profession = profession;
+    }
+
+    public User(@NonNull String userId, @NonNull String email, @NonNull String username, @NonNull String photo, @NonNull String about) {
+        this.userId = userId;
+        this.email = email;
+        this.username = username;
+        this.photo = photo;
+        this.about = about;
     }
 
     public User() {
