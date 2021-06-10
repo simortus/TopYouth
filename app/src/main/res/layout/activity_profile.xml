@@ -1,55 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.navigation.NavigationView
-
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="?attr/actionBarSize"
+    android:orientation="vertical"
     tools:context=".user_profile.UserProfileActivity">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize">
+        <include layout="@layout/bottom_nav_layout" />
+    </RelativeLayout>
+
+
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:weightSum="10"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:weightSum="10">
 
-
-
-    <RelativeLayout
-        android:layout_weight="7"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/user_profile_toolbar"
-            android:background="@color/blue_darkish"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="3">
 
-        </androidx.appcompat.widget.Toolbar>
 
-     <include layout="@layout/top_user_profile"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:weightSum="10">
 
-    </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4">
 
-    <RelativeLayout
-        android:layout_weight="3"
-        android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
-        android:layout_width="match_parent"
-        android:layout_margin="3dp"
-        android:layout_height="0dp">
+                    <com.mikhaellopez.circularimageview.CircularImageView
+                        android:id="@+id/profilePic"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_centerInParent="true"
+                        android:background="@color/yellowish"
+                        android:src="@drawable/user">
 
-        <GridView
-            android:id="@+id/gridView"
-            android:numColumns="3"
-            android:elevation="4dp"
+                    </com.mikhaellopez.circularimageview.CircularImageView>
+
+                    <TextView
+                        android:id="@+id/username"
+                        android:layout_below="@id/profilePic"
+                        android:layout_centerInParent="true"
+                        android:textStyle="bold"
+                        android:text="@string/topUser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                    </TextView>
+
+
+                    <TextView
+                        android:id="@+id/user_status"
+                        android:text="@string/status"
+                        android:layout_width="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_below="@id/username"
+                        android:layout_centerHorizontal="true"
+                        android:textStyle="italic"
+                        android:layout_height="wrap_content">
+                    </TextView>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6">
+
+                    <TextView
+                        android:id="@+id/postNumbers"
+                        android:layout_centerHorizontal="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/you_posted"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/likedPosts"
+                        android:layout_centerHorizontal="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@id/postNumbers"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/you_liked_posts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    </TextView>
+
+
+                </RelativeLayout>
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:layout_marginBottom="?actionBarSize"
+            android:background="@drawable/white_rectangle_white_backg_sharpe_edge">
 
-        </GridView>
+            <GridView
+                android:id="@+id/gridView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="4dp"
+                android:numColumns="3">
 
-    </RelativeLayout>
+            </GridView>
+
+        </RelativeLayout>
+
+
     </LinearLayout>
 
-</com.google.android.material.navigation.NavigationView>
+
+</LinearLayout>

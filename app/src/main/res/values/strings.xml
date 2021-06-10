@@ -15,6 +15,11 @@
     <string name="profile">Profile</string>
     <string name="post">Post</string>
     <string name="sign_out">Sign out</string>
-    <string name="user">user</string>
+    <string name="topUser">Top User</string>
     <string name="have_no_account">Have no account? Register here</string>
+    <string name="not_yet_approved_by_the_admin">Not yet approved by the admin</string>
+    <string name="you_posted">Posted: </string>
+    <string name="you_liked_posts">Liked: </string>
+    <string name="status">Status: </string>
+    <string name="dots">..........</string>
 </resources>

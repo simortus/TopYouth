@@ -13,4 +13,8 @@
     <color name="grey">#80A5A2A2</color>
     <color name="fade_grey">#D5FDFCFC</color>
     <color name="shadow_back">#90E2E8AB</color>
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+
+
 </resources>

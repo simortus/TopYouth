@@ -23,10 +23,16 @@ import androidx.fragment.app.Fragment;
 
 import com.example.topyouth.R;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
+import com.google.common.base.Utf8;
 import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import static androidx.core.content.ContextCompat.getColor;
 
@@ -42,6 +48,9 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
     //context
     private Context context;
 
+    // sha and crypto
+    private MessageDigest hashAlgo;
+
     //auth and db
     private FirebaseAuthSingleton authSingleton;
     private FirebaseAuth mAuth;
@@ -52,10 +61,13 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this.getContext());
         context = getContext();
+        try {
+            hashAlgo = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            Log.d(TAG, "onCreate: hashAlgo Exception: "+e.getLocalizedMessage());
+        }
         authSingleton = FirebaseAuthSingleton.getInst(context);
         mAuth = authSingleton.mAuth();
-
-
 
     }
 
@@ -87,9 +99,13 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
 
             @Override
             public void afterTextChanged(Editable s) {
+
+//                byte[] pass_encoded = hashAlgo.digest(pass.getText().toString().getBytes());
+//                byte[] conf_pass_encoded = hashAlgo.digest(conf_pass.getText().toString().getBytes());
+
                 if (s.toString().length() >= 8) {
-                    register_button.setTextColor(Color.BLACK);
-                    register_button.setBackgroundColor(getResources().getColor(R.color.grey));
+                    register_button.setTextColor(getResources().getColor(R.color.blue_darkish));
+                    register_button.setBackground(getResources().getDrawable(R.drawable.button_design_selector_blue));
                     register_button.setEnabled(true);
                 }
             }
@@ -102,8 +118,11 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         email = view.findViewById(R.id.email_field);
         pass = view.findViewById(R.id.pass_field);
         conf_pass = view.findViewById(R.id.registerCPass_field);
+        register_button = view.findViewById(R.id.button_register);
         progressBar = view.findViewById(R.id.progress_bar);
         loading_layout = view.findViewById(R.id.loading_layout);
+
+        register_button.setOnClickListener(this);
 
     }
 
@@ -113,8 +132,8 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         String mail = email.getText().toString();
         String passWOrd = pass.getText().toString();
         String confirmPass = conf_pass.getText().toString();
-        final HashCode passHash = HashCode.fromBytes(passWOrd.getBytes());
-        final HashCode confPassHash = HashCode.fromBytes(confirmPass.getBytes());
+        final byte[] passHash = hashAlgo.digest(passWOrd.getBytes());
+        final byte[] confPassHash = hashAlgo.digest(confirmPass.getBytes());
 
         //checking if any is empty or pass doesn't match, the rest mAuth takes care of
         if (TextUtils.isEmpty(mail)) {
@@ -132,7 +151,8 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
             pass.setError("!");
             Toast.makeText(getContext(), "Error: Password must match confirm password. Try again", Toast.LENGTH_SHORT).show();
         } else {
-            authSingleton.createUserWithEmailAndPassword(mail, passWOrd);
+            String p = new String(passHash);
+            authSingleton.createUserWithEmailAndPassword(mail, p);
             loading_layout.setVisibility(View.INVISIBLE);
         }
     }

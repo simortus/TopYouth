@@ -5,12 +5,12 @@ import androidx.annotation.NonNull;
 import com.google.firebase.database.Exclude;
 import java.io.Serializable;
 
-public class User implements  Serializable {
+public class TopUser implements  Serializable {
 
     private String userId, email,  username ,photo, about, profession;
 
-    public User(@NonNull String userId, @NonNull String email, @NonNull String username,
-                @NonNull String photo, @NonNull String about, @NonNull String profession) {
+    public TopUser(@NonNull String userId, @NonNull String email, @NonNull String username,
+                   @NonNull String photo, @NonNull String about, @NonNull String profession) {
         this.userId = userId;
         this.email = email;
         this.username = username;
@@ -19,7 +19,7 @@ public class User implements  Serializable {
         this.profession = profession;
     }
 
-    public User(@NonNull String userId, @NonNull String email, @NonNull String username, @NonNull String photo, @NonNull String about) {
+    public TopUser(@NonNull String userId, @NonNull String email, @NonNull String username, @NonNull String photo, @NonNull String about) {
         this.userId = userId;
         this.email = email;
         this.username = username;
@@ -27,8 +27,7 @@ public class User implements  Serializable {
         this.about = about;
     }
 
-    public User() {
-    }
+    public TopUser() {}
 
     @Exclude
     public void setUserId(String userId) {

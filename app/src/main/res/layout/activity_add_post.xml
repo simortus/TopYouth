@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".add_post.AddPostActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize">
+            <include layout="@layout/bottom_nav_layout" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginTop="?actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <include layout="@layout/not_approved" />
+
+        </RelativeLayout>
+    </FrameLayout>
+
+</LinearLayout>

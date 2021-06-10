@@ -107,7 +107,7 @@
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
             android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
-            android:inputType="textEmailAddress"
+            android:inputType="textPassword"
             android:maxLines="1"
             android:elevation="4dp"
             android:maxEms="30"

@@ -9,8 +9,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.login.LoginActivity;
-import com.example.topyouth.molde.User;
+import com.example.topyouth.molde.TopUser;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.ActionCodeSettings;
@@ -27,8 +28,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/**
+ * @author mohamed-msaad
+ * Auth class used to override the Firebase auth methods and return only the needed functionalities
+ **/
 public class FirebaseAuthSingleton extends FirebaseAuth {
     private static final String TAG = "AuthSingleton";
     private Context mContext;
@@ -38,11 +48,11 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference users_ref = database.getReference("users");
     private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
+    private DBSingelton mDbSingleton = DBSingelton.getInstance();
 
 
     //vars
     private final Traveler mTraveler = new Traveler();
-    private DBSingelton mDbSingleton = DBSingelton.getInstance();
 
     //<<------methods--------->>
     private FirebaseAuthSingleton(@NonNull Context context) {
@@ -74,13 +84,13 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
 
     ////works like a charm
     //this is private and restricts the publicly offered login process :)
-    private void verifyAccount(@NonNull FirebaseUser currentUser, @NonNull Context context) {
+    private void verifyAccount(@NonNull FirebaseUser currentUser, @NonNull Context context, @NonNull final String provider) {
         try {
-            if (isUserCompliant(currentUser)) {
+            if (isUserCompliant(currentUser) && provider.equals("password")) {
 
                 Log.d(TAG, "verifyAccount: is email verified: " + currentUser.isEmailVerified());
-                String email = currentUser.getEmail();
-                String userUid = currentUser.getUid();
+                @NonNull final String email = currentUser.getEmail();
+                @NonNull final String userUid = currentUser.getUid();
                 addNewUser(email, userUid);
 
             } else {
@@ -95,14 +105,74 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
         }
     }
 
+    //works like a charm
+    //check if user exists in fire-store and adds it if not else go to main
+    private void getDocumentForUSer(@NonNull final String id, @NonNull final String email) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("user_id", id);
+        map.put("status", "not_approved");
+        DocumentReference thisUserDoc = mFirestore.collection("app_us").document(id);
+        thisUserDoc.get().addOnSuccessListener(documentSnapshot -> {
+            if (!documentSnapshot.exists()) {
+                createDocument(id, email);
+            }
+            if (documentSnapshot.exists()) {
+                Log.d(TAG, "getDocumentForUSer: documentSnapshot id: " + documentSnapshot.getId());
+                //todo here we check if the shared pref is true for phone verified
+                mTraveler.gotoWithFlags(mContext, MainActivity.class);
+            }
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "onFailure: not worked: " + e.getMessage());
+        });
+
+    }
+
+//    private void isAdminApproved() {
+//        final String user_id = getCurrentUser().getUid();
+////        AtomicBoolean is = new AtomicBoolean(false);
+//
+//        DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
+//        not_approved_users.addSnapshotListener((value, error) -> {
+//            if (error == null) {
+//                Log.d(TAG, "onEvent: Document value_id: " + value.getId());
+//                Log.d(TAG, "onEvent: Document value_approved_status: " + value.get("status"));
+//                final String status = (String) value.get("status");
+//                Log.d(TAG, "isAdminApproved: status: " + status);
+//                boolean iss = status.equalsIgnoreCase("approved");
+//                setApproved(iss);
+//                if (iss) {
+//                    isApproved = true;
+//                    setApproved(iss);
+//                }
+//
+//
+//                Log.d(TAG, "isAdminApproved: " + iss);
+//            }
+//        });
+//
+//    }
+
+    //works like a charm
+    private void createDocument(@NonNull final String id, @NonNull final String email) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("user_id", id);
+        map.put("email", email);
+        map.put("status", "not_approved");
+        mFirestore.collection("app_us").document(id).set(map).addOnSuccessListener(documentReference -> {
+            Log.d(TAG, "onSuccess: Successful operation: " + documentReference);
+            mTraveler.gotoWithFlags(mContext, MainActivity.class);
+
+        }).addOnFailureListener(e ->
+                Log.d(TAG, "onFailure: not worked: " + e.getMessage()));
+    }
+
     // //  works like a charm
-    private void addNewUser(@NonNull String email, @NonNull String user_id) {
+    private void addNewUser(@NonNull final String email, @NonNull final String user_id) {
         final String name = "no_name",
                 phone = "no_phone",
                 profileUrl = "no_url";
-        final Traveler mTraveler = new Traveler();
         //todo Mo's: this is to prevent malicious users from trying to skip the phone confirmation, by trying to add a phone number at this step
-        User user = new User(user_id, name, email, phone, profileUrl);
+        final TopUser topUser = new TopUser(user_id, name, email, phone, profileUrl);
         DatabaseReference user_ref = mDbSingleton.getUsers_ref();
         Query query = user_ref.orderByKey().equalTo(user_id);
         query.limitToFirst(1);
@@ -110,21 +180,22 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //add new user data only if doest exist\\ if first time send to identify phone
+                //add new user data only if doesn't exist\\ if first time send to identify phone
                 if (!snapshot.exists()) {
                     Log.d(TAG, "onDataChange: snapshot.exists: " + snapshot.exists());
-                    user_ref.child(user_id).setValue(user).addOnCompleteListener(task -> {
+                    user_ref.child(user_id).setValue(topUser).addOnCompleteListener(task -> {
+                        //after user is added to real time. add him to fire-store DB
                         if (task.isSuccessful()) {
-//                            getDocumentForUSer();
+                            Log.d(TAG, "onDataChange: task success: " + task.isSuccessful());
+                            getDocumentForUSer(user_id, email);
                         }
 
                     }).addOnFailureListener(e ->
                             Log.d(TAG, "onFailure: DB_adding user_error: " + e.getMessage()));
 
-                }
-                if (snapshot.exists()) {
+                } else {
                     //Todo: since we decided to do phone verification always to enhance security
-//                    getDocumentForUSer();
+                    getDocumentForUSer(user_id, email);
                 }
             }
 
@@ -136,59 +207,55 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     }
 
     private String provider(String s) {
-       final String ss = s;
+        final String ss = s;
         return ss;
     }
 
     @NonNull
     @Override
-    public Task<AuthResult> signInWithEmailAndPassword(@NonNull String email, @NonNull String pass) {
-        if (isUserCompliant(mCurrentUser)) {
-            return myAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(task1 -> {
-                if (task1.isSuccessful()) {
-                    mCurrentUser = task1.getResult().getUser();
-                    Task<GetTokenResult> providerTask = getAccessToken(false);
-                    try {
-                        if (providerTask.isSuccessful()) {
-                            String p = provider(providerTask.getResult().getSignInProvider());
-                            Log.d(TAG, "signInWithEmailAndPassword: provider: " + p);
-                            FirebaseUser user = task1.getResult().getUser();
-                            if (isUserCompliant(user) && p.equals("password")) {
-//                                checkDevice();
-                                // TODO: 6/3/21 need to go to home if all is ok
-                                // TODO: Add user to database and firestore if not exist, else go to home.
-
-                            } else {
-                                Toast.makeText(mContext, "Please verify your account!", Toast.LENGTH_SHORT).show();
-                                signOut();
-                            }
-
-                        }
-
-                    } catch (Exception e) {
-                        signOut();
-                        Log.d(TAG, "signInWithEmailAndPassword: task_waiting_error: " + e.getMessage());
+    public Task<AuthResult> signInWithEmailAndPassword(@NonNull final String email, @NonNull final String pass) {
+        return myAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(task1 -> {
+            if (task1.isSuccessful()) {
+                mCurrentUser = task1.getResult().getUser();
+                Task<GetTokenResult> providerTask = getAccessToken(false);
+                try {
+                    if (providerTask.isSuccessful()) {
+                        final String provider = provider(providerTask.getResult().getSignInProvider());
+                        Log.d(TAG, "signInWithEmailAndPassword: provider: " + provider);
+                        verifyAccount(mCurrentUser, mContext, provider);
+//                        if (isUserCompliant(mCurrentUser) && p.equals("password")) {
+//                            // TODO: 6/3/21 need to go to home if all is ok
+//                            // TODO: Add user to database and firestore if not exist, else go to home.
+//                            Toast.makeText(mContext, "Works fine!", Toast.LENGTH_SHORT).show();
+//                            @NonNull final String user_id = mCurrentUser.getUid();
+//                            addNewUser(email, user_id);
+//
+//
+//                        } else {
+//                            Toast.makeText(mContext, "Please verify your account!", Toast.LENGTH_SHORT).show();
+//                            signOut();
+//                        }
                     }
+
+                } catch (Exception e) {
+                    signOut();
+                    Log.d(TAG, "signInWithEmailAndPassword: task_waiting_error: " + e.getMessage());
                 }
-            }).addOnFailureListener(e -> {
-                Log.d(TAG, "signInWithEmailAndPassword: Auth_Error: " + e.getMessage());
-                Toast.makeText(mContext, "Login error; " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                signOut();
-            });
-        } else
-            return null;
+            }
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "signInWithEmailAndPassword: Auth_Error: " + e.getMessage());
+            Toast.makeText(mContext, "Login error; " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            signOut();
+        });
     }
 
     @NonNull
     @Override
     public Task<GetTokenResult> getAccessToken(boolean b) {
-
         Task<GetTokenResult> tokenResultTask = myAuth.getAccessToken(false).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 provider(task.getResult().getSignInProvider());
             }
-
-
         }).addOnFailureListener(e -> {
             Log.d(TAG, "getAccessToken: auth_result_error: " + e.getMessage());
         });
@@ -216,7 +283,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     private void sendEmailVer(@NonNull FirebaseUser user) {
         user.sendEmailVerification().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Log.d(TAG, "sendEmailVer: task is success: "+task.isSuccessful());
+                Log.d(TAG, "sendEmailVer: task is success: " + task.isSuccessful());
                 Toast.makeText(mContext, "We sent you an email verification, check your inbox and click on th link to verify", Toast.LENGTH_SHORT).show();
                 new Handler().postDelayed(() -> {
                     mTraveler.gotoWithFlags(mContext, LoginActivity.class);
@@ -365,8 +432,8 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     @Override
     public Task<String> verifyPasswordResetCode(@NonNull String s) {
         return myAuth.verifyPasswordResetCode(s).addOnCompleteListener(task -> {
-            if (task.isSuccessful()){
-                Log.d(TAG, "verifyPasswordResetCode: task.result: "+task.getResult());
+            if (task.isSuccessful()) {
+                Log.d(TAG, "verifyPasswordResetCode: task.result: " + task.getResult());
             }
             // TODO: 10/30/20 finish this
         }).addOnFailureListener(e -> {

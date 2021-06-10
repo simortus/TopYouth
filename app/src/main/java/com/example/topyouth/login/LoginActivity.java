@@ -1,8 +1,10 @@
 package com.example.topyouth.login;
 
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,14 +21,19 @@ import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
 import com.example.topyouth.utility_classes.Traveler;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "LoginActivity";
 
     //widgets
-    private Button login;
+    private Button button_login;
     private TextView register_new_user;
     private EditText et_email, et_pass;
     private TextView forgot_pass;
@@ -35,6 +42,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     //context
     private Context mContext;
+    private MessageDigest hashAlgo;
 
     //firebase-auth
     private FirebaseAuthSingleton authSingleton;
@@ -51,26 +59,57 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.login_activity);
         mContext = getApplicationContext();
         fragmentManager = getSupportFragmentManager();
+        try {
+            hashAlgo = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            Log.d(TAG, "onCreate: HashAlgo exception: "+e.getLocalizedMessage());
+        }
 
         connectFirebase();
         inintWidgets();
         buttonListeners();
+
+        et_pass.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count < 8) {
+                    button_login.setBackgroundColor(getResources().getColor(R.color.fade_grey));
+                    button_login.setTextColor(getResources().getColor(R.color.grey));
+                    button_login.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() >= 8) {
+                    button_login.setTextColor(getResources().getColor(R.color.blue_darkish));
+                    button_login.setBackground(getResources().getDrawable(R.drawable.button_design_selector_blue));
+                    button_login.setEnabled(true);
+                }
+            }
+        });
     }
 
     private void connectFirebase() {
         authSingleton = FirebaseAuthSingleton.getInst(mContext);
         mAuth = authSingleton.mAuth();
-        mUser = mAuth.getCurrentUser();
+        mUser = authSingleton.getCurrentUser();
 
     }
 
     private void buttonListeners() {
-        login.setOnClickListener(this);
+        button_login.setOnClickListener(this);
         register_new_user.setOnClickListener(this);
+        forgot_pass.setOnClickListener(this);
     }
 
     private void inintWidgets() {
-        login = findViewById(R.id.button_login);
+        button_login = findViewById(R.id.button_login);
         register_new_user = findViewById(R.id.textView_register_new_user);
         et_email = findViewById(R.id.email_field);
         et_pass = findViewById(R.id.pass_field);
@@ -106,8 +145,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loadingLayout.setVisibility(View.VISIBLE);
         String email = et_email.getText().toString();
         String pass = et_pass.getText().toString();
+        byte[] passEncoded = hashAlgo.digest(pass.getBytes());
+        String p = new String(passEncoded);
         if (!email.isEmpty() && !pass.isEmpty()) {
-            authSingleton.signInWithEmailAndPassword(email, pass);
+            Task<AuthResult> authResultTask = authSingleton.signInWithEmailAndPassword(email, p);
+
+            if (!authResultTask.isSuccessful()){
+                loadingLayout.setVisibility(View.INVISIBLE);
+            }
+
+
+
         } else {
             loadingLayout.setVisibility(View.INVISIBLE);
         }

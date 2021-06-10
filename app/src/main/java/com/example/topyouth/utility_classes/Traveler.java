@@ -12,13 +12,15 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.topyouth.home.MainActivity;
 
-public class Traveler extends Activity {
+public class Traveler  {
     private static final String TAG = "Traveler";
 
-    public void gotoWithFlags(@NonNull Context context, @NonNull Class<?extends Activity> cls) {
-        startActivity(new Intent(context, cls)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-        finish();
+    private final Intent mIntent = new Intent();
+
+    public void gotoWithFlags(@NonNull Context current_activity, @NonNull Class<?extends Activity> destinationClass) {
+        mIntent.setClass(current_activity, destinationClass);
+        mIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        current_activity.startActivity(mIntent);
     }
 
     public void goFragment(@NonNull FragmentManager fragmentManager, Fragment fragment, @NonNull int id) {
