@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/userLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <EditText
+            android:id="@+id/postDetailsEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
+            android:hint="@string/your_thoughts"
+            android:padding="5dp">
+
+        </EditText>
+
+        <ImageView
+            android:id="@+id/postImageView"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_below="@id/postDetailsEditText"
+            android:src="@color/yellowish"
+            android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="onClick"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="5dp">
+
+        </ImageView>
+
+        <ImageButton
+            android:id="@+id/uploadButton"
+            android:layout_below="@id/postImageView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="?actionBarSize"
+            android:onClick="onClick"
+            android:src="@drawable/upload"
+            android:elevation="4dp"
+            android:background="@drawable/round_edge_rectangle_for_buttons"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_marginLeft="?actionBarSize"
+            android:layout_marginRight="?actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="35dp">
+        </ImageButton>
+
+    </RelativeLayout>
+</LinearLayout>

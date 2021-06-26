@@ -22,7 +22,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3">
+            android:layout_weight="3.5">
 
 
             <LinearLayout
@@ -33,6 +33,7 @@
 
                 <RelativeLayout
                     android:layout_width="0dp"
+                    android:gravity="center"
                     android:layout_height="match_parent"
                     android:layout_weight="4">
 
@@ -62,6 +63,7 @@
                         android:text="@string/status"
                         android:layout_width="wrap_content"
                         android:textSize="12sp"
+                        android:padding="3dp"
                         android:layout_below="@id/username"
                         android:layout_centerHorizontal="true"
                         android:textStyle="italic"
@@ -109,7 +111,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7"
+            android:layout_weight="6.5"
             android:layout_marginBottom="?actionBarSize"
             android:background="@drawable/white_rectangle_white_backg_sharpe_edge">
 

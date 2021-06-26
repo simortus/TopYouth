@@ -6,11 +6,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import com.example.topyouth.R;
-import com.example.topyouth.utility_classes.BottomNavigationHandler;
+import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -72,7 +71,7 @@ public class UserProfileActivity extends AppCompatActivity {
         final String user_id = mUser.getUid();
         DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
         not_approved_users.addSnapshotListener((value, error) -> {
-            if (error == null) {
+            if (value != null && error == null) {
                 Log.d(TAG, "onEvent: Document value_id: " + value.getId());
                 Log.d(TAG, "onEvent: Document value_approved_status: " + value.get("status"));
                 final String status = (String) value.get("status");
@@ -85,6 +84,11 @@ public class UserProfileActivity extends AppCompatActivity {
                     textView.setText("Not Approved");
                     textView.setTextColor(getResources().getColor(R.color.red));
                 }
+            }
+            else {
+                authSingleton.signOut();
+//                textView.setText("Not Approved");
+//                textView.setTextColor(getResources().getColor(R.color.red));
             }
         });
     }

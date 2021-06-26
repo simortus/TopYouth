@@ -29,6 +29,10 @@ import com.google.firebase.auth.FirebaseUser;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import static com.example.topyouth.utility_classes.PasswordClassStuff.hasDigits;
+import static com.example.topyouth.utility_classes.PasswordClassStuff.hasSpecial;
+import static com.example.topyouth.utility_classes.PasswordClassStuff.isLongEnough;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "LoginActivity";
 
@@ -62,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             hashAlgo = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            Log.d(TAG, "onCreate: HashAlgo exception: "+e.getLocalizedMessage());
+            Log.d(TAG, "onCreate: Hash-Algorithm exception: " + e.getLocalizedMessage());
         }
 
         connectFirebase();
@@ -128,9 +132,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.textViewforgot_pass:
                 // TODO: 6/3/21 open register fragmenet
                 Toast.makeText(mContext, "textViewforgot_pass is clicked", Toast.LENGTH_SHORT).show();
-
-
                 break;
+
             case R.id.textView_register_new_user:
                 // TODO: 6/6/21 open register fragment
                 Toast.makeText(mContext, "textView_register_new_user is clicked", Toast.LENGTH_SHORT).show();
@@ -142,21 +145,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void signIn() {
+//        login_layout.setVisibility(View.INVISIBLE);
         loadingLayout.setVisibility(View.VISIBLE);
         String email = et_email.getText().toString();
         String pass = et_pass.getText().toString();
         byte[] passEncoded = hashAlgo.digest(pass.getBytes());
         String p = new String(passEncoded);
         if (!email.isEmpty() && !pass.isEmpty()) {
-            Task<AuthResult> authResultTask = authSingleton.signInWithEmailAndPassword(email, p);
 
-            if (!authResultTask.isSuccessful()){
+            Task<AuthResult> authResultTask = authSingleton.signInWithEmailAndPassword(email, p);
+            if (!authResultTask.isSuccessful()) {
+                login_layout.setVisibility(View.VISIBLE);
                 loadingLayout.setVisibility(View.INVISIBLE);
             }
 
-
-
         } else {
+            login_layout.setVisibility(View.VISIBLE);
             loadingLayout.setVisibility(View.INVISIBLE);
         }
 
@@ -174,7 +178,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onStart() {
         super.onStart();
         if (mAuth != null && authSingleton.isUserCompliant(mUser)) {
-            traveler.gotoWithFlags(mContext, MainActivity.class);
+            authSingleton.checkApproved();
         } else {
             authSingleton.signOut();
         }

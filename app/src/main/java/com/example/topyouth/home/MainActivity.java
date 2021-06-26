@@ -2,31 +2,35 @@ package com.example.topyouth.home;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.topyouth.R;
 import com.example.topyouth.login.LoginActivity;
-import com.example.topyouth.utility_classes.BottomNavigationHandler;
+import com.example.topyouth.molde.PostModel;
+import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,  AdapterView.OnItemSelectedListener  {
     private static final String TAG = "MainActivity";
     //view
     private FloatingActionButton logOut;
-    private RelativeLayout notApprovedLayout;
+    private RelativeLayout notApprovedLayout, userLayout;
     private BottomNavigationView bottomNavigationView;
 
     //firebase
@@ -38,7 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // context
     private Context mContext;
-    private BottomNavigationHandler bottomNavigationHandler ;
+    private BottomNavigationHandler bottomNavigationHandler;
+
+    //vars
+    private final List<PostModel> postList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,37 +54,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mContext = getApplicationContext();
         widgets();
 
-
         connectFirebase();
         buttonListeners();
-        bottomNavigationHandler.isAdminApproved(mUser,notApprovedLayout);
+        bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
 
     }
-
-//    private void isAdminApproved(RelativeLayout layout) {
-//        final String user_id = mUser.getUid();
-//        DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
-//        not_approved_users.addSnapshotListener((value, error) -> {
-//            if (error == null) {
-//                Log.d(TAG, "onEvent: Document value_id: " + value.getId());
-//                Log.d(TAG, "onEvent: Document value_approved_status: " + value.get("status"));
-//                final String status = (String) value.get("status");
-//                Log.d(TAG, "isAdminApproved: status: " + status);
-//                boolean iss = status.equalsIgnoreCase("approved");
-//                if (iss) {
-//                    layout.setVisibility(View.GONE);
-//                } else
-//                    layout.setVisibility(View.VISIBLE);
-//            }
-//        });
-//
-//    }
 
     private void widgets() {
         logOut = findViewById(R.id.floating_button);
         notApprovedLayout = findViewById(R.id.not_approved_layout);
+        userLayout = findViewById(R.id.userLayout);
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
-        bottomNavigationHandler = new BottomNavigationHandler(mContext,bottomNavigationView);
+        bottomNavigationHandler = new BottomNavigationHandler(mContext, bottomNavigationView);
         bottomNavigationHandler.navigation();
 
     }
@@ -91,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = authSingleton.mAuth();
         mUser = authSingleton.getCurrentUser();
         mAuthStateListener = firebaseAuth -> {
-            mAuth.addAuthStateListener(mAuthStateListener);
+            mAuth.addAuthStateListener(this.mAuthStateListener);
         };
     }
 
@@ -101,11 +89,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         finish();
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.floating_button:
-//                signOut();
+                signOut();
                 Log.d(TAG, "onClick: FloatingActionButton clicked");
                 break;
         }
@@ -118,5 +107,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(new Intent(this, LoginActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        Log.d(TAG, "onItemSelected: Item clicked: "+view.getId());
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        return;
     }
 }

@@ -4,8 +4,11 @@
     package="com.example.topyouth">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+<!--    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />-->
 
     <application
         android:allowBackup="true"
@@ -15,7 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".user_profile.UserProfileActivity"></activity>
+
+        <activity android:name=".user_profile.UserProfileActivity"/>
         <activity android:name=".add_post.AddPostActivity" />
         <activity android:name=".login.LoginActivity">
             <intent-filter>

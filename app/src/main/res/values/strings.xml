@@ -22,4 +22,10 @@
     <string name="you_liked_posts">Liked: </string>
     <string name="status">Status: </string>
     <string name="dots">..........</string>
+    <string name="like_number">Like number</string>
+    <string name="comments_number">Comments number</string>
+    <string name="like">Like</string>
+    <string name="comment">Comment</string>
+    <string name="post_details">Post details</string>
+    <string name="your_thoughts">Your thoughts?</string>
 </resources>

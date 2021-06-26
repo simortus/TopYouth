@@ -49,11 +49,6 @@
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
         </RelativeLayout>
 
-        <!--        </RelativeLayout>-->
-        <!--        &lt;!&ndash;bottom navigation&ndash;&gt;-->
-        <!--        <include layout="@layout/bottom_nav_layout" />-->
-
-
     </FrameLayout>
 
 </LinearLayout>

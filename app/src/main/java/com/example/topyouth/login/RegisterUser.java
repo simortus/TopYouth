@@ -23,10 +23,12 @@ import androidx.fragment.app.Fragment;
 
 import com.example.topyouth.R;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
+import com.google.android.gms.tasks.Task;
 import com.google.common.base.Utf8;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -35,6 +37,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static androidx.core.content.ContextCompat.getColor;
+import static com.example.topyouth.utility_classes.PasswordClassStuff.hasDigits;
+import static com.example.topyouth.utility_classes.PasswordClassStuff.hasSpecial;
+import static com.example.topyouth.utility_classes.PasswordClassStuff.isLongEnough;
 
 public class RegisterUser extends Fragment implements View.OnClickListener {
     private static final String TAG = "RegisterUserFragment";
@@ -59,8 +64,9 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseApp.initializeApp(this.getContext());
-        context = getContext();
+        context = getActivity();
+        assert context !=null;
+        FirebaseApp.initializeApp(context);
         try {
             hashAlgo = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
@@ -70,12 +76,6 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         mAuth = authSingleton.mAuth();
 
     }
-
-
-
-
-
-
 
     @Nullable
     @Override
@@ -100,9 +100,6 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
             @Override
             public void afterTextChanged(Editable s) {
 
-//                byte[] pass_encoded = hashAlgo.digest(pass.getText().toString().getBytes());
-//                byte[] conf_pass_encoded = hashAlgo.digest(conf_pass.getText().toString().getBytes());
-
                 if (s.toString().length() >= 8) {
                     register_button.setTextColor(getResources().getColor(R.color.blue_darkish));
                     register_button.setBackground(getResources().getDrawable(R.drawable.button_design_selector_blue));
@@ -119,9 +116,8 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         pass = view.findViewById(R.id.pass_field);
         conf_pass = view.findViewById(R.id.registerCPass_field);
         register_button = view.findViewById(R.id.button_register);
-        progressBar = view.findViewById(R.id.progress_bar);
-        loading_layout = view.findViewById(R.id.loading_layout);
-
+        progressBar = view.findViewById(R.id.loadingBar);
+        loading_layout = view.findViewById(R.id.loading_layout_register);
         register_button.setOnClickListener(this);
 
     }
@@ -135,26 +131,34 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         final byte[] passHash = hashAlgo.digest(passWOrd.getBytes());
         final byte[] confPassHash = hashAlgo.digest(confirmPass.getBytes());
 
-        //checking if any is empty or pass doesn't match, the rest mAuth takes care of
-        if (TextUtils.isEmpty(mail)) {
-            email.setError("Required");
-            Toast.makeText(getContext(), "Please type in a valid email", Toast.LENGTH_SHORT).show();
+        if (!TextUtils.isEmpty(mail) && !TextUtils.isEmpty(passWOrd)  && !TextUtils.isEmpty(confirmPass) ){
+            if (isLongEnough(passWOrd) && hasDigits(passWOrd) && hasSpecial(passWOrd)) {
+                if (passWOrd.equals(confirmPass) && Arrays.equals(passHash, confPassHash)){
+                    Log.d(TAG, "registerWithEmail: everything is ok");
+                    String p = new String(passHash);
+                    Task<AuthResult> createUserTask = authSingleton.createUserWithEmailAndPassword(mail, p);
+                    if (createUserTask.isSuccessful()){
+                        loading_layout.setVisibility(View.INVISIBLE);
+                    }
+                    else {
+                        loading_layout.setVisibility(View.INVISIBLE);
+                    }
+                }
+                else {
+                    loading_layout.setVisibility(View.INVISIBLE);
+                    Toast.makeText(getContext(), "Error: Password must match confirm password. Try again", Toast.LENGTH_SHORT).show();
+                }
 
-        } else if (TextUtils.isEmpty(passWOrd)) {
-            pass.setError("Required");
-            Toast.makeText(getContext(), "Please chose password", Toast.LENGTH_SHORT).show();
-
-        } else if (TextUtils.isEmpty(confirmPass)) {
-            conf_pass.setError("Required");
-            Toast.makeText(getContext(), "Please confirm password", Toast.LENGTH_SHORT).show();
-        } else if (!passWOrd.equals(confirmPass) && !passHash.equals(confPassHash)) {
-            pass.setError("!");
-            Toast.makeText(getContext(), "Error: Password must match confirm password. Try again", Toast.LENGTH_SHORT).show();
-        } else {
-            String p = new String(passHash);
-            authSingleton.createUserWithEmailAndPassword(mail, p);
-            loading_layout.setVisibility(View.INVISIBLE);
+            }
+            else {
+                Toast.makeText(context,"Please chose a strong password, with digits, uppercase letter and special characters",Toast.LENGTH_SHORT).show();
+            }
         }
+        else {
+            loading_layout.setVisibility(View.INVISIBLE);
+            Toast.makeText(getContext(), "All fields are required. Try again", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 

@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.login.LoginActivity;
 import com.example.topyouth.molde.TopUser;
@@ -107,14 +109,14 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
 
     //works like a charm
     //check if user exists in fire-store and adds it if not else go to main
-    private void getDocumentForUSer(@NonNull final String id, @NonNull final String email) {
+    private void getDocumentForUSer(@NonNull final String userId, @NonNull final String email) {
         final Map<String, Object> map = new HashMap<>();
-        map.put("user_id", id);
+        map.put("user_id", userId);
         map.put("status", "not_approved");
-        DocumentReference thisUserDoc = mFirestore.collection("app_us").document(id);
+        DocumentReference thisUserDoc = mFirestore.collection("app_us").document(userId);
         thisUserDoc.get().addOnSuccessListener(documentSnapshot -> {
             if (!documentSnapshot.exists()) {
-                createDocument(id, email);
+                createDocument(userId, email);
             }
             if (documentSnapshot.exists()) {
                 Log.d(TAG, "getDocumentForUSer: documentSnapshot id: " + documentSnapshot.getId());
@@ -127,38 +129,33 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
 
     }
 
-//    private void isAdminApproved() {
-//        final String user_id = getCurrentUser().getUid();
-////        AtomicBoolean is = new AtomicBoolean(false);
-//
-//        DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
-//        not_approved_users.addSnapshotListener((value, error) -> {
-//            if (error == null) {
-//                Log.d(TAG, "onEvent: Document value_id: " + value.getId());
-//                Log.d(TAG, "onEvent: Document value_approved_status: " + value.get("status"));
-//                final String status = (String) value.get("status");
-//                Log.d(TAG, "isAdminApproved: status: " + status);
-//                boolean iss = status.equalsIgnoreCase("approved");
-//                setApproved(iss);
-//                if (iss) {
-//                    isApproved = true;
-//                    setApproved(iss);
-//                }
-//
-//
-//                Log.d(TAG, "isAdminApproved: " + iss);
-//            }
-//        });
-//
-//    }
+    public void checkApproved() {
+        try {
+            final String user_id = mCurrentUser.getUid();
+            DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
+            not_approved_users.addSnapshotListener((value, error) -> {
+                if (value != null) {
+                    if (!value.exists()) {
+                        signOut();
+                        mTraveler.gotoWithFlags(mContext, LoginActivity.class);
+                    } else {
+                        mTraveler.gotoWithFlags(mContext, MainActivity.class);
+                    }
+                }
+
+            });
+        }catch (Exception e){
+            Log.d(TAG, "checkApproved: Exception: "+e.getLocalizedMessage());
+        }
+    }
 
     //works like a charm
-    private void createDocument(@NonNull final String id, @NonNull final String email) {
+    private void createDocument(@NonNull final String userId, @NonNull final String email) {
         final Map<String, Object> map = new HashMap<>();
-        map.put("user_id", id);
+        map.put("user_id", userId);
         map.put("email", email);
         map.put("status", "not_approved");
-        mFirestore.collection("app_us").document(id).set(map).addOnSuccessListener(documentReference -> {
+        mFirestore.collection("app_us").document(userId).set(map).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "onSuccess: Successful operation: " + documentReference);
             mTraveler.gotoWithFlags(mContext, MainActivity.class);
 
@@ -170,9 +167,10 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     private void addNewUser(@NonNull final String email, @NonNull final String user_id) {
         final String name = "no_name",
                 phone = "no_phone",
-                profileUrl = "no_url";
+                profileUrl = "no_url",
+                about = "no_details";
         //todo Mo's: this is to prevent malicious users from trying to skip the phone confirmation, by trying to add a phone number at this step
-        final TopUser topUser = new TopUser(user_id, name, email, phone, profileUrl);
+        final TopUser topUser = new TopUser(user_id, email, name, profileUrl, about );
         DatabaseReference user_ref = mDbSingleton.getUsers_ref();
         Query query = user_ref.orderByKey().equalTo(user_id);
         query.limitToFirst(1);
@@ -223,18 +221,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
                         final String provider = provider(providerTask.getResult().getSignInProvider());
                         Log.d(TAG, "signInWithEmailAndPassword: provider: " + provider);
                         verifyAccount(mCurrentUser, mContext, provider);
-//                        if (isUserCompliant(mCurrentUser) && p.equals("password")) {
-//                            // TODO: 6/3/21 need to go to home if all is ok
-//                            // TODO: Add user to database and firestore if not exist, else go to home.
-//                            Toast.makeText(mContext, "Works fine!", Toast.LENGTH_SHORT).show();
-//                            @NonNull final String user_id = mCurrentUser.getUid();
-//                            addNewUser(email, user_id);
-//
-//
-//                        } else {
-//                            Toast.makeText(mContext, "Please verify your account!", Toast.LENGTH_SHORT).show();
-//                            signOut();
-//                        }
+
                     }
 
                 } catch (Exception e) {
