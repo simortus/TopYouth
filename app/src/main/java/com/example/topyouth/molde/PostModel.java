@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public final class PostModel implements Serializable {
     private static final String TAG = "PostModel";
+    private String postOwnerID;
     private String postId;
     private String imageUrl;
     private String postDetails;
@@ -28,7 +29,7 @@ public final class PostModel implements Serializable {
 
     }
 
-    private String postOwnerID;
+
 
     public String getPostId() {
         return this.postId;

@@ -12,122 +12,76 @@
         <include layout="@layout/bottom_nav_layout" />
     </RelativeLayout>
 
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:weightSum="10">
+        android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:id="@+id/profilePic"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="5dp"
+            android:onClick="onClick"
+            android:src="@drawable/user" />
+
+        <Button
+            android:id="@+id/saveButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_alignParentEnd="true"
+            android:text="@string/save"
+            android:enabled="false"
+            android:textAllCaps="false"
+            android:visibility="gone"
+            android:onClick="onClick"
+            android:fontFamily="sans-serif-medium"
+            android:background="@color/yellowish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </Button>
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profilePic"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:text="@string/topUser"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/user_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/username"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="3dp"
+            android:padding="3dp"
+            android:text="@string/status"
+            android:textSize="12sp"
+            android:textStyle="italic" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_rectangle_white_backg_sharpe_edge">
+
+        <GridView
+            android:id="@+id/gridView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3.5">
+            android:layout_height="match_parent"
+            android:elevation="4dp"
+            android:numColumns="3">
 
+        </GridView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:weightSum="10">
-
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:gravity="center"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4">
-
-                    <com.mikhaellopez.circularimageview.CircularImageView
-                        android:id="@+id/profilePic"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_centerInParent="true"
-                        android:background="@color/yellowish"
-                        android:src="@drawable/user">
-
-                    </com.mikhaellopez.circularimageview.CircularImageView>
-
-                    <TextView
-                        android:id="@+id/username"
-                        android:layout_below="@id/profilePic"
-                        android:layout_centerInParent="true"
-                        android:textStyle="bold"
-                        android:text="@string/topUser"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                    </TextView>
-
-
-                    <TextView
-                        android:id="@+id/user_status"
-                        android:text="@string/status"
-                        android:layout_width="wrap_content"
-                        android:textSize="12sp"
-                        android:padding="3dp"
-                        android:layout_below="@id/username"
-                        android:layout_centerHorizontal="true"
-                        android:textStyle="italic"
-                        android:layout_height="wrap_content">
-                    </TextView>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="6">
-
-                    <TextView
-                        android:id="@+id/postNumbers"
-                        android:layout_centerHorizontal="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerInParent="true"
-                        android:layout_marginStart="5dp"
-                        android:text="@string/you_posted"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                    </TextView>
-
-                    <TextView
-                        android:id="@+id/likedPosts"
-                        android:layout_centerHorizontal="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/postNumbers"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginStart="5dp"
-                        android:text="@string/you_liked_posts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                    </TextView>
-
-
-                </RelativeLayout>
-
-            </LinearLayout>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6.5"
-            android:layout_marginBottom="?actionBarSize"
-            android:background="@drawable/white_rectangle_white_backg_sharpe_edge">
-
-            <GridView
-                android:id="@+id/gridView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:elevation="4dp"
-                android:numColumns="3">
-
-            </GridView>
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </LinearLayout>

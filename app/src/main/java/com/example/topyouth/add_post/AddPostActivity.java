@@ -29,6 +29,7 @@ import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
 import com.example.topyouth.utility_classes.DBSingelton;
+import com.example.topyouth.utility_classes.MediaStuff;
 import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
@@ -50,6 +51,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class AddPostActivity extends AppCompatActivity implements View.OnClickListener {
@@ -87,6 +89,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     private String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private TopUser currentTopUser;
     private final Traveler traveler = new Traveler();
+    private MediaStuff mediaStuff;
 
     private TopUser getCurrentTopUser() {
         return currentTopUser;
@@ -101,13 +104,14 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_post);
         context = this;
+        mediaStuff = new MediaStuff(this);
         widgets();
         connectFirebase();
 
         bottomNavigationHandler = new BottomNavigationHandler(context, bottomNavigationView);
         bottomNavigationHandler.navigation();
         bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
-        checkPermissions();
+        MediaStuff.checkPermissions(this);
 
     }
 
@@ -115,11 +119,12 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     public void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         assert data != null;
-        boolean besoins = resultCode == RESULT_OK && requestCode == CAMERA_REQUEST && mUri != null;
+        boolean besoins = resultCode == RESULT_OK && requestCode == CAMERA_REQUEST;
 
         try {
 
             if (besoins) {
+                mUri = mediaStuff.getmUri();
                 Glide.with(this).load(mUri).centerCrop().into(postImage);
             } else if (resultCode == RESULT_OK) {
                 mUri = data.getData();
@@ -141,15 +146,15 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
 
             case R.id.postImageView:
                 Log.d(TAG, "onClick: postImageView clicked");
-                dialogChoice();
+                mediaStuff.dialogChoice();
                 break;
 
         }
     }
 
-    private void alertUser(@NonNull final Uri uri, @NonNull final String postDet) {
+    private void alertUser(@NonNull final Uri uri) {
         final CharSequence[] options = {"Yes", "No"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Post has no details, Upload anyway?");
         builder.setPositiveButton(options[0], (dialogInterface, i) -> {
             final String postDetails = "No details";
@@ -175,9 +180,10 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
         progressDialog.show();
         ref.child(postOwnerID).child(postID).putFile(uri).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+
                 task.getResult().getStorage().getDownloadUrl().addOnCompleteListener(task1 -> {
                     if (task1.isSuccessful()) {
-                        String url = task1.toString();
+                        final String url = task1.getResult().toString();
                         createPost(postID, postDet, url);
                         progressDialog.dismiss();
                     }
@@ -197,28 +203,6 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
             progressDialog.setMessage("uploading " + (int) progress + "%");
         });
     }
-//            @Override
-//            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    //todo continue here
-//                    ref.getDownloadUrl().addOnCompleteListener(task1 -> {
-//                        String url = task1.toString();
-//                        createPost(postID, postDet, url);
-//                        progressDialog.dismiss();
-//
-//                    }).addOnFailureListener(e -> {
-//                        progressDialog.dismiss();
-//                        Log.d(TAG, "sendPost: addOnFailureListener exception: " + e.getLocalizedMessage());
-//                    }).addOnFailureListener(e -> {
-//                        progressDialog.dismiss();
-//                        Log.d(TAG, "sendPost: addOnFailureListener exception: " + e.getLocalizedMessage());
-//
-//                    }).addOnProgressListener(snapshot -> {
-//                        //todo continue here
-//                        double progress = (100.0 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
-//                        progressDialog.setMessage("uploading " + (int) progress + "%");
-//
-//                    });
 
 
     private void checkPostForValidity() {
@@ -226,7 +210,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
         final Uri uri = mUri;
         if (uri != null) {
             if (postDet.isEmpty()) {
-                alertUser(uri, postDet);
+                alertUser(uri);
             } else {
                 uploadNow(uri, postDet);
             }
@@ -258,13 +242,10 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
         return getCurrentTopUser();
     }
 
-    private void createPost(@NonNull final String postID,
-                            @NonNull final String postDet, @NonNull final String url) {
+    private void createPost(@NonNull final String postID, @NonNull final String postDet, @NonNull final String url) {
         final TopUser user = topUser();
         final String userID = user.getUserId();
-
-        // todo contiunue here
-        PostModel post = new PostModel(postID, url, postDet, user.getUserId());
+        final PostModel post = new PostModel(postID, url, postDet, user.getUserId());
         final DatabaseReference postRef = database.getReference("posts");
         Query query = postRef.child(user.getUserId()).child(postID);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -275,7 +256,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
                     postRef.child(userID).child(postID).setValue(post).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "onComplete: post added to database");
-                            Toast.makeText(context,"Uploaded successfully",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Uploaded successfully", Toast.LENGTH_SHORT).show();
                             postImage.setImageDrawable(getResources().getDrawable(R.color.yellowish));
                             postImage.refreshDrawableState();
                             postDetails.clearComposingText();
@@ -325,61 +306,33 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    /**
-     * Open dialog to user to chose Media source
-     * Camera or Gallery
-     */
-    private void dialogChoice() {
-        final CharSequence[] options = {"CAMERA", "GALLERY", "CANCEL"};
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Add Image");
-        builder.setIcon(R.mipmap.top_youth_logo_icone);
-        builder.setItems(options, (dialog, which) -> {
-            if (options[which].equals("CAMERA")) {
-                takePicture();
-            } else if (options[which].equals("GALLERY")) {
-                selectPicture();
-            } else if (options[which].equals("CANCEL")) {
-                dialog.dismiss();
-            }
-
-        });
-        builder.show();
-    }
-
-    /**
-     * Check permission request if SDK > 23
-     */
-    private void checkPermissions() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            int REQUEST_CAMERA = 1;
-            int REQUEST_GALLERY = 2;
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_GALLERY | REQUEST_CAMERA);
-        }
-    }
-
-    /**
-     * Open camera
-     */
-    private void takePicture() {
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "NEW PICTURE");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "From the camerea");
-        mUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                values);
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
-
-    }
-
-    /**
-     * Open phone gallery
-     */
-    private void selectPicture() {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        photoPickerIntent.setType("image/*");
-        photoPickerIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
-    }
+//    /**
+//     * Check permission request if SDK > 23
+//     */
+//
+//    /**
+//     * Open camera
+//     */
+//    private void takePicture() {
+//        ContentValues values = new ContentValues();
+//        final String label = new Date(System.currentTimeMillis()).toString();
+//        values.put(MediaStore.Images.Media.TITLE, "Top_youth/" + label);
+//        values.put(MediaStore.Images.Media.DESCRIPTION, "From the camera");
+//        mUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                values);
+//        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+//        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+//
+//    }
+//
+//    /**
+//     * Open phone gallery
+//     */
+//    private void selectPicture() {
+//        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        photoPickerIntent.setType("image/*");
+//        photoPickerIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+//        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+//    }
 }

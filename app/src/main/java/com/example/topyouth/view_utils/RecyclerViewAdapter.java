@@ -16,25 +16,40 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
+import com.example.topyouth.molde.Comments;
+import com.example.topyouth.molde.Likes;
 import com.example.topyouth.molde.PostModel;
+import com.example.topyouth.molde.TopUser;
 import com.example.topyouth.utility_classes.DBSingelton;
 import com.google.firebase.database.DatabaseReference;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class RecyclerViewer extends RecyclerView.Adapter<RecyclerViewer.CardViewHolder> {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CardViewHolder> {
+    private static final String TAG = "RecyclerViewAdapter";
     //database
-    private DBSingelton dbSingelton;
-    private DatabaseReference myRef;
     private Context mContext;
 
-    private ArrayList<PostModel> postsList;
+    private List<PostModel> postsList;
+    private List<TopUser> postOwnerList;
+    private List<Likes> postLikes;
+    private List<Comments> postComments;
+
+    public RecyclerViewAdapter(Context mContext, List<PostModel> postsList, List<TopUser> postOwnerList, List<Likes> postLikes, List<Comments> postComments) {
+        this.mContext = mContext;
+        this.postsList = postsList;
+        this.postOwnerList = postOwnerList;
+        this.postLikes = postLikes;
+        this.postComments = postComments;
+    }
 
 
-    public RecyclerViewer(ArrayList<PostModel> plantList, Context context) {
-        postsList = plantList;
-        this.mContext = context;
+    public RecyclerViewAdapter(Context mContext, List<PostModel> postsList, List<TopUser> postOwnerList) {
+        this.mContext = mContext;
+        this.postsList = postsList;
+        this.postOwnerList = postOwnerList;
     }
 
     @NonNull
@@ -53,18 +68,29 @@ public class RecyclerViewer extends RecyclerView.Adapter<RecyclerViewer.CardView
      */
     @Override
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
+        if (postsList.size() > 0) {
+            PostModel currentPost = postsList.get(position);
+            if (postOwnerList.size() > 0) {
+                TopUser user = postOwnerList.get(position);
+                String userName = user.getUsername(),
+                        userProfile = user.getPhoto();
+                holder.postUsername.setText(userName);
+                if (!userProfile.equals("no_photo")) {
+                    // post owner data
+                    Glide.with(mContext).load(userProfile).fitCenter().into(holder.postUserPorfileImage);
+                }
+            }
 
 
-        PostModel currentPost = postsList.get(position);
-
-
-//        Glide.with(mContext).load(currentPost.getPlantProfileUrl()).fitCenter().into(holder.mPlantProfilePicture);
-//
-//        holder.mPlantName.setText(currentItem.getmPlantName());
-//        holder.mPlantDescription.setText(currentItem.getmPlantDescription());
-
+            //post details
+            final String url = currentPost.getImageUrl();
+            Log.d(TAG, "onBindViewHolder: post_url: "+url);
+            holder.postDetails.setText(currentPost.getPostDetails());
+            Glide.with(this.mContext).load(url).centerCrop().into(holder.postImageView);
+        }
 
     }
+
 
     @Override
     public int getItemCount() {
@@ -75,7 +101,7 @@ public class RecyclerViewer extends RecyclerView.Adapter<RecyclerViewer.CardView
         private static final String TAG = "CardViewHolder";
 
         private CircularImageView postUserPorfileImage, postUserStatus;
-        private TextView postUsername, postLikeNumber, postCommentNumber, likeButtonText, commentButtonText;
+        private TextView postUsername, postDetails, postLikeNumber, postCommentNumber, likeButtonText, commentButtonText;
         private ImageButton settingImageButton, likeImageButton, commentImageButton;
         private ImageView postImageView;
 
@@ -85,6 +111,7 @@ public class RecyclerViewer extends RecyclerView.Adapter<RecyclerViewer.CardView
 
             postUserPorfileImage = itemView.findViewById(R.id.post_user_image);
             postUserStatus = itemView.findViewById(R.id.approved_sign);
+            postDetails = itemView.findViewById(R.id.post_details);
             postUsername = itemView.findViewById(R.id.post_user_name);
             postLikeNumber = itemView.findViewById(R.id.post_likes_number);
             postCommentNumber = itemView.findViewById(R.id.post_comments_number);

@@ -18,8 +18,8 @@
     <string name="topUser">Top User</string>
     <string name="have_no_account">Have no account? Register here</string>
     <string name="not_yet_approved_by_the_admin">Not yet approved by the admin</string>
-    <string name="you_posted">Posted: </string>
-    <string name="you_liked_posts">Liked: </string>
+    <string name="you_posted">Posts: </string>
+    <string name="you_liked_posts">Likes: </string>
     <string name="status">Status: </string>
     <string name="dots">..........</string>
     <string name="like_number">Like number</string>
@@ -28,4 +28,5 @@
     <string name="comment">Comment</string>
     <string name="post_details">Post details</string>
     <string name="your_thoughts">Your thoughts?</string>
+    <string name="save">Save</string>
 </resources>
