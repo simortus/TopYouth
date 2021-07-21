@@ -36,6 +36,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     private static final String TAG = "MainActivity";
@@ -43,9 +45,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton logOut;
     private RelativeLayout notApprovedLayout, userLayout;
     private BottomNavigationView bottomNavigationView;
-    private RecyclerViewAdapter recyclerViewAdapter;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView recyclerView;
+    private RecyclerViewAdapter viewAdapter;
+    private RecyclerView recyclerViewer;
 
 
     //firebase
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase database;
     private DBSingelton dbSingelton;
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
 
     // context
@@ -70,10 +72,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
-        recyclerViewAdapter = new RecyclerViewAdapter(mContext, postList, postOwnerList);
-
-
         findWidgets();
+        viewAdapter = new RecyclerViewAdapter(this, postList, postOwnerList);
+
+        recyclerViewer.setAdapter(viewAdapter);
+
+
+
 
         connectFirebase();
         buttonListeners();
@@ -88,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
         bottomNavigationHandler = new BottomNavigationHandler(mContext, bottomNavigationView);
         bottomNavigationHandler.navigation();
-        recyclerView = findViewById(R.id.recyclerViewer);
+        recyclerViewer = findViewById(R.id.recyclerViewer);
 
 
     }
@@ -106,17 +111,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         dbSingelton = DBSingelton.getInstance();
         database = dbSingelton.getDbInstance();
+        Runnable one = this::readPosts;
+        Runnable two = this::setUpRecyclerView;
 
-        ((Runnable) this::readPosts).run();
-        setUpRecyclerView();
-
+        executorService.execute(one);
+        executorService.execute(two);
     }
 
     private void setUpRecyclerView() {
-        recyclerView.setAdapter(recyclerViewAdapter);
-        recyclerView.setHasFixedSize(true);
+        recyclerViewer.setHasFixedSize(true);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(mContext);
-        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerViewer.setLayoutManager(mLayoutManager);
     }
 
     private final void postOwner(final String user_id) {
@@ -129,10 +134,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d(TAG, "onDataChange: exists");
                     Log.d(TAG, "onDataChange: node-key: " + dataSnapshot.getKey());
                     TopUser user = dataSnapshot.getValue(TopUser.class);
-                    Log.d(TAG, "onDataChange: PostOwnerID: " + user.getUserId());
                     Log.d(TAG, "onDataChange: PostOwnerID: " + user_id);
                     postOwnerList.add(user);
-                    recyclerViewAdapter.notifyDataSetChanged();
+                    viewAdapter.notifyDataSetChanged();
 
                 }
             }
@@ -163,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 postList.add(post);
                                 Log.d(TAG, "onDataChange: postListSIze: " + postList.size());
                                 postOwner(post.getPostOwnerID());
-                                recyclerViewAdapter.notifyDataSetChanged();
+                                viewAdapter.notifyDataSetChanged();
                             }
 
                         }

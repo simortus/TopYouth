@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
+import com.example.topyouth.molde.Comments;
+import com.example.topyouth.molde.Likes;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
 import com.example.topyouth.utility_classes.DBSingelton;
@@ -51,7 +53,9 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class AddPostActivity extends AppCompatActivity implements View.OnClickListener {
@@ -305,34 +309,4 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
         };
     }
 
-
-//    /**
-//     * Check permission request if SDK > 23
-//     */
-//
-//    /**
-//     * Open camera
-//     */
-//    private void takePicture() {
-//        ContentValues values = new ContentValues();
-//        final String label = new Date(System.currentTimeMillis()).toString();
-//        values.put(MediaStore.Images.Media.TITLE, "Top_youth/" + label);
-//        values.put(MediaStore.Images.Media.DESCRIPTION, "From the camera");
-//        mUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-//                values);
-//        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-//        startActivityForResult(cameraIntent, CAMERA_REQUEST);
-//
-//    }
-//
-//    /**
-//     * Open phone gallery
-//     */
-//    private void selectPicture() {
-//        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        photoPickerIntent.setType("image/*");
-//        photoPickerIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-//        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
-//    }
 }

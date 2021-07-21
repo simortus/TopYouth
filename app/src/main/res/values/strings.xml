@@ -29,4 +29,8 @@
     <string name="post_details">Post details</string>
     <string name="your_thoughts">Your thoughts?</string>
     <string name="save">Save</string>
+    <string name="settings">Settings</string>
+    <string name="post_title">Post title</string>
+    <string name="ipsum_lorem">Ipsum Lorem</string>
+    <string name="done">Done</string>
 </resources>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/fade_grey">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/commentLayout_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/round_edge_rectangle_for_buttons"
+            android:hint="@string/comment"
+            android:inputType="textMultiLine"
+            android:padding="5dp"
+            android:textAlignment="center"
+            android:textAllCaps="false" />
+
+        <ImageButton
+            android:id="@+id/commentLayout_sendButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/commentLayout_edit_text"
+            android:layout_margin="5dp"
+            android:background="@drawable/round_edge_rectangle_for_buttons"
+            android:src="@drawable/check_icone"/>
+
+        <ImageButton
+            android:id="@+id/commentLayout_cancelButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/commentLayout_edit_text"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="5dp"
+            android:background="@drawable/round_edge_rectangle_for_buttons"
+            android:src="@drawable/cancel_icone">
+
+        </ImageButton>
+
+
+    </RelativeLayout>
+</LinearLayout>

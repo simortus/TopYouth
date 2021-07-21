@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public final class PostModel implements Serializable {
     private static final String TAG = "PostModel";
@@ -12,9 +13,21 @@ public final class PostModel implements Serializable {
     private String imageUrl;
     private String postDetails;
     private ArrayList<TopUser> postLiker, postCommentators;
+    private List<Comments> commentList ;
+    private List<Likes> likesList;
 
-    public PostModel(String postId, String imageUrl, String postDetails, ArrayList<TopUser> postLiker,
-                     ArrayList<TopUser> postCommentators, String postOwnerID) {
+    public PostModel(@NonNull String postId , @NonNull String postOwnerID, @NonNull String imageUrl,
+                     @NonNull String postDetails,@NonNull List<Comments> commentList,@NonNull List<Likes> likesList) {
+        this.postId = postId;
+        this.postOwnerID = postOwnerID;
+        this.imageUrl = imageUrl;
+        this.postDetails = postDetails;
+        this.commentList = commentList;
+        this.likesList = likesList;
+    }
+
+    public PostModel(@NonNull String postId, @NonNull String imageUrl,@NonNull String postDetails,
+                     @NonNull ArrayList<TopUser> postLiker, @NonNull ArrayList<TopUser> postCommentators,@NonNull String postOwnerID) {
         this.postId = postId;
         this.imageUrl = imageUrl;
         this.postDetails = postDetails;
@@ -30,16 +43,15 @@ public final class PostModel implements Serializable {
     }
 
 
-
-    public String getPostId() {
+    public @NonNull String getPostId() {
         return this.postId;
     }
 
-    public String getImageUrl() {
+    public @NonNull String getImageUrl() {
         return this.imageUrl;
     }
 
-    public String getPostDetails() {
+    public @NonNull String getPostDetails() {
         return this.postDetails;
     }
 

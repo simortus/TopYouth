@@ -6,8 +6,13 @@ import com.google.firebase.database.Exclude;
 import java.io.Serializable;
 
 public class TopUser implements  Serializable {
-
+    private static final String TAG = "TopUser";
     private String userId, email,  username ,photo, about;
+
+    public TopUser(String userId, String username) {
+        this.userId = userId;
+        this.username = username;
+    }
 
     public TopUser(@NonNull String userId, @NonNull String email, @NonNull String username, @NonNull String photo, @NonNull String about) {
         this.userId = userId;

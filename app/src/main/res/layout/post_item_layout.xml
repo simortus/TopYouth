@@ -1,125 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/grey"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        app:cardCornerRadius="3dp"
+        app:cardElevation="5dp">
 
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:id="@+id/post_user_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:src="@drawable/user" />
-
-        <TextView
-            android:id="@+id/post_user_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="15dp"
-            android:layout_toEndOf="@id/post_user_image"
-            android:fontFamily="sans-serif-condensed-medium"
-            android:text="@string/topUser"
-            android:textColor="@color/blue_darkish"
-            android:textSize="12sp"
-            android:textStyle="bold" />
-
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:id="@+id/approved_sign"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="15dp"
-            android:layout_toEndOf="@id/post_user_name"
-            android:src="@drawable/user_approved_sign" />
-
-        <ImageButton
-            android:id="@+id/post_setting"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="5dp"
-            android:background="@drawable/setting_sign"
-            android:onClick="onClick" />
-
-        <TextView
-            android:id="@+id/post_details"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/post_user_image"
-            android:layout_margin="3dp"
-            android:padding="3dp"
-            android:text="@string/post_details"
-            android:textAlignment="center" />
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/post_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_below="@id/post_details"
-            android:layout_marginStart="?actionBarSize"
-            android:layout_marginEnd="?actionBarSize"
-            android:src="@color/yellowish" />
 
-        <TextView
-            android:id="@+id/post_likes_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/post_image"
-            android:layout_margin="5dp"
-            android:text="@string/like_number"
-            android:textColor="@color/black" />
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/post_user_image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:src="@drawable/user" />
 
-        <TextView
-            android:id="@+id/post_comments_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/post_image"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="5dp"
-            android:text="@string/comments_number"
-            android:textColor="@color/black" />
+            <TextView
+                android:id="@+id/post_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="15dp"
+                android:maxLines="1"
+                android:maxEms="20"
+                android:layout_toEndOf="@id/post_user_image"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:text="@string/topUser"
+                android:textColor="@color/blue_darkish"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/comment_button"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/post_likes_number"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/comment_sign" />
 
-        <ImageButton
-            android:id="@+id/like_button"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/post_likes_number"
-            android:layout_marginStart="5dp"
-            android:src="@drawable/like_sign" />
+            <ImageButton
+                android:id="@+id/post_setting"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="3dp"
+                android:contentDescription="@string/settings"
+                android:src="@drawable/setting_sign"
+                android:onClick="onClick" />
 
-        <TextView
-            android:id="@+id/like_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/like_button"
-            android:layout_marginStart="35dp"
-            android:text="@string/like" />
+            <TextView
+                android:id="@+id/post_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_user_image"
+                android:layout_margin="3dp"
+                android:padding="3dp"
+                android:contentDescription="@string/post_title"
+                android:text="@string/post_details"
+                android:textAlignment="center" />
 
-        <TextView
-            android:id="@+id/comment_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/comment_button"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="15dp"
-            android:text="@string/comment"/>
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/post_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@id/post_details"
+                android:layout_marginStart="?actionBarSize"
+                android:layout_marginEnd="?actionBarSize"
+                android:src="@color/yellowish" />
+
+            <TextView
+                android:id="@+id/post_likes_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_image"
+                android:layout_margin="5dp"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/post_comments_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_image"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="5dp"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/comment_button"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_likes_number"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="5dp"
+                android:clickable="true"
+                android:elevation="10dp"
+                android:contentDescription="@string/comment"
+                android:focusable="true"
+                android:onClick="onClick"
+                android:src="@drawable/comment_icone1" />
+
+            <ImageButton
+                android:id="@+id/like_button"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_likes_number"
+                android:layout_marginStart="8dp"
+                android:clickable="true"
+                android:elevation="10dp"
+                android:focusable="true"
+                android:onClick="onClick"
+                android:src="@drawable/like_sign" />
+
+            <TextView
+                android:id="@+id/like_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/like_button"
+                android:layout_marginStart="35dp"
+                android:text="@string/like" />
+
+            <TextView
+                android:id="@+id/comment_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/comment_button"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="15dp"
+                android:text="@string/comment" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
