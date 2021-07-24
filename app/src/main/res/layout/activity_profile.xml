@@ -1,87 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fitsSystemWindows="false"
     tools:context=".user_profile.UserProfileActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?actionBarSize">
-        <include layout="@layout/bottom_nav_layout" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:id="@+id/profilePic"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="5dp"
-            android:onClick="onClick"
-            android:src="@drawable/user" />
-
-        <Button
-            android:id="@+id/saveButton"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_alignParentEnd="true"
-            android:text="@string/save"
-            android:enabled="false"
-            android:textAllCaps="false"
-            android:visibility="gone"
-            android:onClick="onClick"
-            android:fontFamily="sans-serif-medium"
-            android:background="@color/yellowish"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-        </Button>
-
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profilePic"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"
-            android:text="@string/topUser"
-            android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10">
 
 
-        <TextView
-            android:id="@+id/user_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/username"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="3dp"
-            android:padding="3dp"
-            android:text="@string/status"
-            android:textSize="12sp"
-            android:textStyle="italic" />
-
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/white_rectangle_white_backg_sharpe_edge">
-
-        <GridView
-            android:id="@+id/gridView"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:elevation="4dp"
-            android:numColumns="3">
+            android:layout_height="?actionBarSize">
 
-        </GridView>
+            <include layout="@layout/bottom_nav_layout" />
+        </RelativeLayout>
 
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3">
+
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/profilePic"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="5dp"
+                android:background="@drawable/user"
+                android:onClick="onClick" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolBar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                app:buttonGravity="center_vertical"
+                app:collapseIcon="@drawable/comment_icone1"
+                app:titleTextColor="@color/blue_darkish"/>
 
 
-</LinearLayout>
+            <Button
+                android:id="@+id/saveButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@color/yellowish"
+                android:enabled="false"
+                android:fontFamily="sans-serif-medium"
+                android:onClick="onClick"
+                android:text="@string/save"
+                android:textAllCaps="false"
+                android:visibility="gone">
+
+            </Button>
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profilePic"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/roboto"
+                android:layout_marginTop="5dp"
+                android:text="@string/topUser"
+                android:textStyle="bold" />
+
+
+            <TextView
+                android:id="@+id/user_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/username"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="3dp"
+                android:padding="3dp"
+                android:fontFamily="@font/rosarivo"
+                android:text="@string/status"
+                android:textSize="12sp"
+                android:textStyle="italic" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:background="@drawable/white_rectangle_white_backg_sharpe_edge">
+
+            <GridView
+                android:id="@+id/gridView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="4dp"
+                android:numColumns="3">
+
+            </GridView>
+
+        </RelativeLayout>
+    </LinearLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?actionBarSize"
+        android:layout_gravity="start"
+        android:onClick="onClick"
+        android:background="@drawable/button_design_selector_blue"
+        android:elevation="10dp"
+        app:headerLayout="@layout/layout_nav_header"
+        android:fadingEdge="horizontal|vertical"
+        android:requiresFadingEdge="horizontal"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/nav_bar_menu"
+        app:itemHorizontalPadding="5dp"
+        tools:context=".user_profile.User_Profile">
+
+    </com.google.android.material.navigation.NavigationView> <!---->
+
+</androidx.drawerlayout.widget.DrawerLayout>

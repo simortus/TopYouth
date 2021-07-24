@@ -6,43 +6,60 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/fade_grey">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/commentLayout_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:background="@drawable/round_edge_rectangle_for_buttons"
-            android:hint="@string/comment"
+            android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
+            android:hint="@string/your_thoughts"
             android:inputType="textMultiLine"
-            android:padding="5dp"
+            android:padding="8sp"
             android:textAlignment="center"
             android:textAllCaps="false" />
 
-        <ImageButton
+        <Button
             android:id="@+id/commentLayout_sendButton"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
             android:layout_below="@id/commentLayout_edit_text"
-            android:layout_margin="5dp"
-            android:background="@drawable/round_edge_rectangle_for_buttons"
-            android:src="@drawable/check_icone"/>
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="?actionBarSize"
+            android:elevation="5dp"
+            android:padding="5dp"
+            android:text="@string/send"
+            android:textAllCaps="false"
+            android:fontFamily="@font/arimo"
+            android:layout_marginBottom="10dp"
+            android:requiresFadingEdge="horizontal|vertical"
+            android:background="@drawable/button_design_selector_white"
+            android:clickable="true"
+            android:focusable="true"
+            android:fadingEdge="vertical|horizontal"
+            />
 
-        <ImageButton
+        <Button
             android:id="@+id/commentLayout_cancelButton"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
             android:layout_below="@id/commentLayout_edit_text"
             android:layout_alignParentEnd="true"
-            android:layout_margin="5dp"
-            android:background="@drawable/round_edge_rectangle_for_buttons"
-            android:src="@drawable/cancel_icone">
+            android:elevation="5dp"
+            android:textAllCaps="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="?actionBarSize"
+            android:fontFamily="@font/arimo"
+            android:text="@string/discard"
+            android:layout_marginBottom="10dp"
+            android:fadingEdge="vertical|horizontal"
+            android:background="@drawable/button_design_selector_white"
+            >
 
-        </ImageButton>
+        </Button>
 
 
     </RelativeLayout>

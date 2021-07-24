@@ -18,7 +18,7 @@
             android:elevation="5dp"
             android:layout_height="match_parent"
             android:background="@color/shadow_back"
-            android:visibility="gone">
+            android:visibility="invisible">
 
             <ProgressBar
                 android:id="@+id/loadingBar"
@@ -100,15 +100,15 @@
 
             <Button
                 android:id="@+id/button_login"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
                 android:layout_below="@id/pass_field"
                 android:layout_centerHorizontal="true"
-                android:layout_marginStart="100dp"
-                android:layout_marginTop="20dp"
+                android:layout_margin="10dp"
+                android:fontFamily="@font/arimo"
                 android:layout_marginEnd="100dp"
-                android:background="@drawable/button_design_selector_blue"
-                android:elevation="4dp"
+                android:background="@drawable/button_design_selector_white"
+                android:elevation="5dp"
                 android:onClick="onClick"
                 android:text="@string/login"
                 android:textAllCaps="false" />

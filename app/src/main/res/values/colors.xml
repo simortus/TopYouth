@@ -11,10 +11,11 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="grey">#80A5A2A2</color>
-    <color name="fade_grey">#D5FDFCFC</color>
+    <color name="fade_grey">#80E3F2FD</color>
     <color name="shadow_back">#90E2E8AB</color>
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
+    <color name="red_light">#FA685D</color>
     <color name="yellow_fade_recy">#4AF6EFB5</color>
 
 

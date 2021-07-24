@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -68,7 +69,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     private RelativeLayout notApprovedLayout, userLayout;
     private EditText postDetails;
     private ImageView postImage;
-    private ImageButton uploadButton;
+    private Button uploadButton;
 
 
     //navigation handlers

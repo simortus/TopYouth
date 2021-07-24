@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-          <include layout="@layout/add_post_layout"/>
+                <include layout="@layout/add_post_layout" />
 
 
             </RelativeLayout>

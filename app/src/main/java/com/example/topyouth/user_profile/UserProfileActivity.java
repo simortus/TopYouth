@@ -2,7 +2,13 @@ package com.example.topyouth.user_profile;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -10,21 +16,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
+import com.example.topyouth.login.LoginActivity;
 import com.example.topyouth.molde.TopUser;
 import com.example.topyouth.utility_classes.DBSingelton;
 import com.example.topyouth.utility_classes.MediaStuff;
+import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,7 +53,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -51,8 +64,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     //view
     private BottomNavigationView bottomNavigationView;
     private CircularImageView profileImage;
-    private TextView status, username;
+    private TextView status, username, emailHeader;
     private Button saveButton;
+    private Toolbar toolbar;
+    private View nav_header_view;
+    private NavigationView mNavigationView;
+    private DrawerLayout mDrawerLayout;
+
 
     //navigation handlers
     private BottomNavigationHandler bottomNavigationHandler;
@@ -104,7 +122,35 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         saveButton = findViewById(R.id.saveButton);
         profileImage.setOnClickListener(this);
         saveButton.setOnClickListener(this);
+
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mNavigationView = findViewById(R.id.nav_view);
+        toolbar = findViewById(R.id.toolBar);
+        //heaDER_LAYOUT
+        nav_header_view = mNavigationView.getHeaderView(0);
+        emailHeader = nav_header_view.findViewById(R.id.textView_emailDisplay_header);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.open, R.string.close);
+        DrawerArrowDrawable arrowDrawable = new DrawerArrowDrawable(context);
+        arrowDrawable.setColor(getResources().getColor(R.color.blue_darkish));
+        arrowDrawable.setSpinEnabled(true);
+        arrowDrawable.mutate();
+        toggle.setDrawerArrowDrawable(arrowDrawable);
+        toggle.syncState();
         setUserInfo();
+
+        mNavigationView.setOnClickListener(this);
+        navigationViewClickListener();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();//exits if back pressed
+        //handling for the drawerLayout so we exit it instead of exiting the activity
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
 
     }
 
@@ -127,7 +173,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                         username.setText(user.getUsername());
                         if (!user.getPhoto().equals("no_photo")) {
                             Glide.with(context).load(user.getPhoto()).centerCrop().into(profileImage);
-                        }
+                            emailHeader.setText(user.getEmail());
+                        } else
+                            profileImage.setBackground(getResources().getDrawable(R.drawable.user));
 
                     }
                 }
@@ -266,9 +314,189 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, "onCancelled: Database error: " + databaseError.getMessage());
+                Toast.makeText(context, "Error updating your profile picture, ", Toast.LENGTH_SHORT).show();
 
             }
         });
+
+    }
+
+    /**
+     * @use navigation view clickListener
+     **/
+    private void navigationViewClickListener() {
+        try {
+            mNavigationView.setNavigationItemSelectedListener(menuItem -> {
+                switch (menuItem.getItemId()) {
+                    case R.id.chengeUserNameItem:
+                        Log.d(TAG, "navigationViewClickListener chengeUserNameItem ");
+//                        menuItem.setChecked(true);
+//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
+//                        mDrawerLayout.closeDrawer(GravityCompat.START);
+
+//                        saveUsername();
+                        break;
+
+                    case R.id.changeProfPictureItem:
+                        Log.d(TAG, "navigationViewClickListener changeProfPictureItem ");
+//                        menuItem.setChecked(true);
+//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
+//                        mDrawerLayout.closeDrawer(GravityCompat.START);
+//                        optionDialog();
+                        break;
+
+                    case R.id.signOutItem:
+                        Log.d(TAG, "navigationViewClickListener signOutItem ");
+                        menuItem.setChecked(true);
+//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
+                        mDrawerLayout.closeDrawer(mNavigationView);
+                        mDrawerLayout.clearFocus();
+                        mNavigationView.getMenu().close();
+                        showSignOutDialog();
+                        break;
+
+                    case R.id.resetPassItem:
+                        Log.d(TAG, "navigationViewClickListener resetPassItem ");
+//                        menuItem.setChecked(true);
+//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
+//                        mDrawerLayout.closeDrawer(GravityCompat.START);
+//                        handlePasswordReset();
+                        break;
+
+                    case R.id.delete_accountItem:
+                        Log.d(TAG, "navigationViewClickListener delete_accountItem ");
+                        menuItem.setChecked(true);
+                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+                        showDeleteAccountDialog();
+
+                        break;
+                }
+                return false;
+            });
+        } catch (Exception e) {
+            Log.d(TAG, "navigationViewClickListener: " + e.getLocalizedMessage());
+        }
+    }
+
+    private void showDeleteAccountDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
+        wlp.gravity = Gravity.CENTER;
+        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        alertDialog.getWindow().setAttributes(wlp);
+        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_design_selector_white));
+
+        View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
+        TextView dialogTitle = layoutView.findViewById(R.id.dialogTitleTextView);
+        Button confirmButton = layoutView.findViewById(R.id.confirmButton);
+        Button cancelButton = layoutView.findViewById(R.id.cancelButton);
+        confirmButton.setText(R.string.delete_accnt);
+        dialogTitle.setText(R.string.delet_accnt_warning);
+        confirmButton.getDisplay();
+
+        alertDialog.setView(layoutView);
+
+        confirmButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            deleteAccnt();
+        });
+        cancelButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+
+        alertDialog.show();
+    }
+
+    private void deleteAccnt() {
+        final String uid = mUser.getUid();
+
+        // delete user from realTime users node
+        // delete user from storage
+        // delete user from firestore, if not permitted, send a delete request in the firestore document set "delete_requests"
+        // delete user from auth
+
+        Runnable deleteFromUserNode = () -> {
+            final Query userQuery = dbSingelton.getUsers_ref().child(uid);
+            userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        dataSnapshot.getRef().removeValue().addOnCompleteListener(task -> {
+                            Log.d(TAG, "onComplete: success: " + task.isSuccessful());
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.d(TAG, "onCancelled: databaseError: " + databaseError.getMessage());
+                }
+            });
+
+        };
+        Runnable deleteFromStorage = () -> {
+            final StorageReference storageReference = dbSingelton.getStorage().getReference("users").child(uid);
+            storageReference.delete().addOnCompleteListener(task -> {
+                Log.d(TAG, "onComplete: success: " + task.isSuccessful());
+
+            }).addOnFailureListener(e -> {
+                Log.d(TAG, "onCancelled: databaseError: " + e.getMessage());
+            });
+
+        };
+        Runnable deleteFromAuth = () -> {
+
+            mUser.delete().addOnCompleteListener(task -> {
+                Log.d(TAG, "onComplete: success: " + task.isSuccessful());
+                // TODO: 7/24/21 continue with th rest proceders, logout and go to LoginActivity
+
+            }).addOnFailureListener(e -> {
+                Log.d(TAG, "onCancelled: databaseError: " + e.getMessage());
+            });
+
+        };
+
+
+//        executor.execute(deleteFromUserNode);
+//        executor.execute(deleteFromStorage);
+//        executor.execute(deleteFromAuth);
+    }
+
+    private void showSignOutDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
+        wlp.gravity = Gravity.CENTER;
+        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        alertDialog.getWindow().setAttributes(wlp);
+        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_design_selector_white));
+
+        View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
+        Button confirmButton = layoutView.findViewById(R.id.confirmButton);
+        Button cancelButton = layoutView.findViewById(R.id.cancelButton);
+        alertDialog.setView(layoutView);
+
+        confirmButton.setOnClickListener(v -> {
+            authSingleton.signOut();
+            new Traveler().gotoWithFlags(context, LoginActivity.class);
+            finish();
+            alertDialog.dismiss();
+        });
+        cancelButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+
+        alertDialog.show();
+
 
     }
 }

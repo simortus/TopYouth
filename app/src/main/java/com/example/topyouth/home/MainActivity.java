@@ -42,7 +42,6 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     private static final String TAG = "MainActivity";
     //view
-    private FloatingActionButton logOut;
     private RelativeLayout notApprovedLayout, userLayout;
     private BottomNavigationView bottomNavigationView;
     private RecyclerViewAdapter viewAdapter;
@@ -78,16 +77,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerViewer.setAdapter(viewAdapter);
 
 
-
-
         connectFirebase();
-        buttonListeners();
         bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
 
     }
 
     private void findWidgets() {
-        logOut = findViewById(R.id.floating_button);
         notApprovedLayout = findViewById(R.id.not_approved_layout);
         userLayout = findViewById(R.id.userLayout);
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
@@ -96,10 +91,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerViewer = findViewById(R.id.recyclerViewer);
 
 
-    }
-
-    private void buttonListeners() {
-        logOut.setOnClickListener(this);
     }
 
     private void connectFirebase() {
@@ -136,9 +127,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     TopUser user = dataSnapshot.getValue(TopUser.class);
                     Log.d(TAG, "onDataChange: PostOwnerID: " + user_id);
                     postOwnerList.add(user);
-                    viewAdapter.notifyDataSetChanged();
+//                    viewAdapter.notifyDataSetChanged();
 
                 }
+                viewAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -152,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void readPosts() {
         final DatabaseReference postRef = database.getReference("posts");
         Query query = postRef.getRef();
+        //todo need to remove the event listener and add child event listener  to avoid the database errror
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -167,8 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 postList.add(post);
                                 Log.d(TAG, "onDataChange: postListSIze: " + postList.size());
                                 postOwner(post.getPostOwnerID());
-                                viewAdapter.notifyDataSetChanged();
                             }
+                            viewAdapter.notifyDataSetChanged();
 
                         }
                     }
@@ -193,12 +186,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.floating_button:
-                signOut();
-                Log.d(TAG, "onClick: FloatingActionButton clicked");
-                break;
-        }
+//        switch (view.getId()) {
+//        }
     }
 
 
@@ -212,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.d(TAG, "onItemSelected: Item clicked: " + view.getId());
+        Log.d(TAG, "onItemSelected: Item clicked: " + adapterView.getSelectedView().getId());
 
     }
 

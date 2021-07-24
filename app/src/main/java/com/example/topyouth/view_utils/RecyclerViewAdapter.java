@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.Log;
@@ -151,8 +152,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 if (dataSnapshot.exists()) {
                     if (dataSnapshot.child(userid).exists()) {
                         holder.likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.liked_icone));
+                        holder.likeText.setText(R.string.unlike);
                     } else {
                         holder.likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.like_sign));
+                        holder.likeText.setText(R.string.like);
                     }
                 }
                 if (dataSnapshot.hasChildren()) {
@@ -214,7 +217,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         //view
         private CircularImageView postUserPorfileImage;
-        private TextView postUsername, postDetails, postLikeNumber, postCommentNumber;
+        private TextView postUsername, postDetails, postLikeNumber, postCommentNumber, likeText;
         private ImageButton settingImageButton, likeImageButton, commentImageButton;
         private ImageView postImageView;
 
@@ -236,6 +239,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             likeImageButton = itemView.findViewById(R.id.like_button);
             commentImageButton = itemView.findViewById(R.id.comment_button);
             postImageView = itemView.findViewById(R.id.post_image);
+            likeText = itemView.findViewById(R.id.like_text);
 
             likeImageButton.setOnClickListener(this);
             settingImageButton.setOnClickListener(this);
@@ -266,109 +270,28 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         }
 
-//        private void openCommentDisplay() {
-//            //Dialog view layout and widgets
-//            final View layoutView = mContext.getLayoutInflater().inflate(R.layout.comment_display_layout, null);
-//            final CircularImageView profile = layoutView.findViewById(R.id.commenter_profilePic);
-//            final ListView commentListView = layoutView.findViewById(R.id.list_view);
-//            final Button doneButton = layoutView.findViewById(R.id.done_button);
-//
-//            //Dialog constructor and setup
-//            final AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-//            dialog.setView(layoutView);
-//            final AlertDialog alertDialog = dialog.create();
-//            WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
-//            wlp.windowAnimations = R.style.MaterialAlertDialog_MaterialComponents_Title_Panel;
-//            wlp.gravity = Gravity.CENTER;
-//            wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
-//            alertDialog.getWindow().setAttributes(wlp);
-//            alertDialog.setCanceledOnTouchOutside(false);
-//            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//            alertDialog.show();
-//
-//            doneButton.setOnClickListener(view -> alertDialog.dismiss());
-//            //Data  and layout setup
-//            final String postID = postsList.get(getAdapterPosition()).getPostId();
-//
-//            final List<Comments> commentsList = new ArrayList<>();
-//            final List<TopUser> commnterList = new ArrayList<>();
-//
-//
-//            final List<Comments> lables = new ArrayList<>();
-//
-//            ArrayAdapter<Comments> dataAdapter = new ArrayAdapter(mContext, R.layout.comment_display_layout, lables);
-//            dialog.setAdapter(dataAdapter, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    Toast.makeText(mContext,"You have selected " + lables.get(which),Toast.LENGTH_LONG).show();
-//                }
-//            });
-//
-//            dialog.show();
-//
-//            ListViewAdapter listViewAdapter = new ListViewAdapter(mContext, commentsList, commnterList);
-//            commentListView.setAdapter(listViewAdapter);
-//            final Query commentQuery = commentRef.child(postID);
-//
-//            Runnable comRun = new Runnable() {
-//                @Override
-//                public void run() {
-//                    commentQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                            if (dataSnapshot.exists()) {
-//                                if (dataSnapshot.hasChildren()) {
-//                                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
-//                                        final String userId = ds.getKey();
-//                                        Log.d(TAG, "onDataChange: userId: " + userId);
-//                                        fetchUser(userId, commnterList, listViewAdapter);
-//                                        for (DataSnapshot dss : ds.getChildren()) {
-//
-//                                            final Comments comment = dss.getValue(Comments.class);
-//                                            commentsList.add(comment);
-//                                            Log.d(TAG, "onDataChange: commentSnapshot id: " + comment.getComment_id());
-//                                            Log.d(TAG, "onDataChange: commentSnapshot comment text: " + comment.getCommentText());
-//                                            listViewAdapter.notifyDataSetChanged();
-//                                        }
-//                                    }
-//
-//
-//                                }
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//                            Log.d(TAG, "onCancelled: databaseError: " + databaseError.getMessage());
-//                        }
-//                    });
-//                }
-//            };
-//
-//            executors.execute(comRun);
-//
-//        }
 
         private void openCommentDisplay() {
             final View layoutView = mContext.getLayoutInflater().inflate(R.layout.comment_display_layout, null);
-            ListView listView = layoutView.findViewById(R.id.list_view);
+            final ListView listView = layoutView.findViewById(R.id.list_view);
 
-            List<TopUser> commentators = new ArrayList<>();
-            List<Comments> commentsList = new ArrayList<>();
-            ListViewAdapter myadapter = new ListViewAdapter(mContext, commentsList, commentators);
+            final List<TopUser> commentators = new ArrayList<>();
+            final List<Comments> commentsList = new ArrayList<>();
+            final ListViewAdapter myadapter = new ListViewAdapter(mContext, commentsList, commentators);
 
             //Dialog constructor and setup
             final AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             final AlertDialog alertDialog = dialog.create();
+            alertDialog.setCanceledOnTouchOutside(false);
+
             WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
-            wlp.windowAnimations = R.style.MaterialAlertDialog_MaterialComponents_Title_Panel;
+            wlp.windowAnimations = R.style.Widget_AppCompat_Light_ListPopupWindow;
             wlp.gravity = Gravity.CENTER;
             wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
             alertDialog.getWindow().setAttributes(wlp);
-            alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-            dialog.setNegativeButton("Done", (dialogInterface, i) -> alertDialog.dismiss());
+            dialog.setNegativeButton("Done", (dialogInterface, i) -> dialogInterface.dismiss());
             dialog.setView(layoutView);
 
             //Data  and layout setup
@@ -434,19 +357,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         //works like a charm
         private void displayCommentLayoutDialog() {
             final View layoutView = mContext.getLayoutInflater().inflate(R.layout.comment_layout, null);
-            final ImageButton sendButton = layoutView.findViewById(R.id.commentLayout_sendButton);
-            final ImageButton cancelButton = layoutView.findViewById(R.id.commentLayout_cancelButton);
+            final Button sendButton = layoutView.findViewById(R.id.commentLayout_sendButton);
+            final Button cancelButton = layoutView.findViewById(R.id.commentLayout_cancelButton);
             final EditText commentEditText = layoutView.findViewById(R.id.commentLayout_edit_text);
             final AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             dialog.setView(layoutView);
             final AlertDialog alertDialog = dialog.create();
             WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
             wlp.windowAnimations = R.style.MaterialAlertDialog_MaterialComponents_Title_Panel;
-            wlp.gravity = Gravity.BOTTOM;
+            wlp.gravity = Gravity.CENTER;
             wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
             alertDialog.getWindow().setAttributes(wlp);
             alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            alertDialog.getWindow().setBackgroundDrawable(mContext.getDrawable(R.drawable.button_design_selector_white));
+//            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             alertDialog.show();
 
             sendButton.setOnClickListener(view1 -> {
@@ -477,15 +401,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             Runnable likeRun = () -> {
                 final Likes like = new Likes(user_id);
-                final Query likeQuery = likeRef.child(postID);
+                final Query likeQuery = likeRef.child(postID).child(user_id);
                 likeQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
                             likeRef.child(postID).child(user_id).setValue(like).addOnSuccessListener(aVoid -> {
                                 likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.liked_icone));
+                                likeText.setText(R.string.unlike);
                                 Log.d(TAG, "onSuccess: like added successfully");
                                 Toast.makeText(mContext, "like added", Toast.LENGTH_SHORT).show();
+
 
                             }).addOnFailureListener(e -> {
                                 Log.d(TAG, "onFailure: failed adding like: " + e.getLocalizedMessage());
@@ -494,6 +420,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         } else {
                             likeRef.child(postID).child(user_id).removeValue().addOnSuccessListener(aVoid -> {
                                 likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.like_sign));
+                                likeText.setText(R.string.like);
 
                                 Log.d(TAG, "onSuccess: like removed successfully");
                                 Toast.makeText(mContext, "Like removed", Toast.LENGTH_SHORT).show();
@@ -539,25 +466,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             executors.execute(commentRun);
 
         }
-//        private void bundleFunctionality(Fragment livingConditions) {
-//            Bundle bundle = new Bundle();
-////            String plant_name = mPlantName.getText().toString();
-////            String plant_description = mPlantDescription.getText().toString();
-////            String plant_profile_pic = profilePictureUrl;
-////
-////            bundle.putString("name", plant_name);
-////            bundle.putString("description", plant_description);
-////            bundle.putString("profilePictureUrl", plant_profile_pic);
-////            bundle.putString("minSun", minSun);
-////            bundle.putString("maxSun", maxSun);
-////            bundle.putString("minTemp", minTemp);
-////            bundle.putString("maxTemp", maxTemp);
-////            bundle.putString("minHumidity", minHumidity);
-////            bundle.putString("maxHumidity", maxHumidity);
-////
-////            livingConditions.setArguments(bundle);
-//
-//        }
+
 
     }
 
@@ -590,53 +499,58 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             final View viewHolder = inflater.inflate(R.layout.comment_layout_list, parent, false);
             // setup view
             final CircularImageView commenterProfile = viewHolder.findViewById(R.id.commenter_profilePic);
-            final TextView username = viewHolder.findViewById(R.id.username);
-            final TextView commentText = viewHolder.findViewById(R.id.comment_textView);
+            final TextView usernameTextView = viewHolder.findViewById(R.id.username);
+            final TextView commentTextView = viewHolder.findViewById(R.id.comment_textView);
+            final TextView commentDateTextView = viewHolder.findViewById(R.id.comment_date);
 
-            if (commentText == null) {
+            if (commentTextView == null) {
                 Log.d(TAG, "getView: what the fuck!");
             }
 
-
-//            if (commnters.size() > 0) {
-//                TopUser commenter = commnters.get(position);
-//                Log.d(TAG, "getView: user: " + commenter.getPhoto());
-//                //setup commenter details
-////                Glide.with(mContext).load(commenter.getPhoto()).centerCrop().into(commenterProfile);
-////                username.setText(commenter.getUsername());
-//            }
             if (commentList.size() > 0) {
                 Comments currentComment = commentList.get(position);
                 Log.d(TAG, "getView: current comment: " + currentComment);
                 //setup comment details
-                commentText.setText(currentComment.getCommentText());
+                final String comment = currentComment.getCommentText();
+                final String comment_date = currentComment.getCommentDate();
+
+                if (comment != null) {
+                    commentTextView.setText(comment);
+                    commentDateTextView.setText(comment_date);
+                }
 
                 for (TopUser commenter : commnters) {
                     if (commenter.getUserId().equals(currentComment.getUser_id())) {
                         Glide.with(mContext).load(commenter.getPhoto()).centerCrop().into(commenterProfile);
-                        username.setText(commenter.getUsername());
+                        usernameTextView.setText(commenter.getUsername());
                     }
                 }
 
             }
-
-
-//            CircularImageView mProfileImg = viewHolder.findViewById(R.id.comment_profile_picture);
-//            TextView mUsername = viewHolder.findViewById(R.id.comment_username);
-//            TextView mComment = viewHolder.findViewById(R.id.comment);
-//
-//            Glide.with(getContext())
-//                    .load(currentComment.getUserProfilePhoto())
-//                    .fitCenter()
-//                    .centerCrop()
-//                    .into(mProfileImg);
-//
-//            mUsername.setText(currentComment.getUsername());
-//            mComment.setText(currentComment.getComment());
-
             return viewHolder;
         }
     }
 
 
 }
+
+
+//        private void bundleFunctionality(Fragment livingConditions) {
+//            Bundle bundle = new Bundle();
+////            String plant_name = mPlantName.getText().toString();
+////            String plant_description = mPlantDescription.getText().toString();
+////            String plant_profile_pic = profilePictureUrl;
+////
+////            bundle.putString("name", plant_name);
+////            bundle.putString("description", plant_description);
+////            bundle.putString("profilePictureUrl", plant_profile_pic);
+////            bundle.putString("minSun", minSun);
+////            bundle.putString("maxSun", maxSun);
+////            bundle.putString("minTemp", minTemp);
+////            bundle.putString("maxTemp", maxTemp);
+////            bundle.putString("minHumidity", minHumidity);
+////            bundle.putString("maxHumidity", maxHumidity);
+////
+////            livingConditions.setArguments(bundle);
+//
+//        }

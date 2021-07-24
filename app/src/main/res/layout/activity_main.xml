@@ -33,20 +33,6 @@
             <include layout="@layout/layout_center_view_pager" />
             <include layout="@layout/not_approved" />
 
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/floating_button"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                app:elevation="4dp"
-                android:layout_marginEnd="20dp"
-                android:src="@mipmap/top_youth_logo_icone"
-                android:layout_marginBottom="?actionBarSize"
-                android:elevation="5dp">
-
-            </com.google.android.material.floatingactionbutton.FloatingActionButton>
         </RelativeLayout>
 
     </FrameLayout>

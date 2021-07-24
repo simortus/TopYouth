@@ -76,23 +76,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         et_pass.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                button_login.setEnabled(false);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count < 8) {
-                    button_login.setBackgroundColor(getResources().getColor(R.color.fade_grey));
-                    button_login.setTextColor(getResources().getColor(R.color.grey));
                     button_login.setEnabled(false);
                 }
+                else button_login.setEnabled(true);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().length() >= 8) {
-                    button_login.setTextColor(getResources().getColor(R.color.blue_darkish));
-                    button_login.setBackground(getResources().getDrawable(R.drawable.button_design_selector_blue));
                     button_login.setEnabled(true);
                 }
             }
@@ -145,21 +142,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void signIn() {
-//        login_layout.setVisibility(View.INVISIBLE);
-        loadingLayout.setVisibility(View.VISIBLE);
         String email = et_email.getText().toString();
         String pass = et_pass.getText().toString();
         byte[] passEncoded = hashAlgo.digest(pass.getBytes());
         String p = new String(passEncoded);
         if (!email.isEmpty() && !pass.isEmpty()) {
 
+            login_layout.setVisibility(View.INVISIBLE);
+            loadingLayout.setVisibility(View.VISIBLE);
             Task<AuthResult> authResultTask = authSingleton.signInWithEmailAndPassword(email, p);
             if (!authResultTask.isSuccessful()) {
                 login_layout.setVisibility(View.VISIBLE);
                 loadingLayout.setVisibility(View.INVISIBLE);
             }
 
-        } else {
+        }
+        else {
             login_layout.setVisibility(View.VISIBLE);
             loadingLayout.setVisibility(View.INVISIBLE);
         }
