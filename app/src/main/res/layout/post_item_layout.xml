@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grey"
+    android:background="@android:color/transparent"
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
@@ -14,6 +15,7 @@
         app:cardElevation="5dp">
 
         <RelativeLayout
+            android:background="@android:color/transparent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -29,9 +31,9 @@
                 android:id="@+id/post_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
                 android:maxLines="1"
                 android:maxEms="20"
+                android:layout_alignBottom="@id/post_user_image"
                 android:layout_toEndOf="@id/post_user_image"
                 android:fontFamily="@font/arimo"
                 android:text="@string/topUser"
@@ -43,8 +45,9 @@
             <ImageButton
                 android:id="@+id/post_setting"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:elevation="10dp"
+                android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="3dp"
                 android:contentDescription="@string/settings"
@@ -57,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_user_image"
                 android:layout_margin="3dp"
-                android:fontFamily="@font/ruda"
+                android:fontFamily="@font/roboto"
                 android:padding="3dp"
                 android:contentDescription="@string/post_title"
                 android:text="@string/post_details"
@@ -70,15 +73,20 @@
                 android:layout_marginStart="3dp"
                 android:layout_marginEnd="3dp"
                 android:layout_below="@id/post_details"
-                android:src="@color/yellowish" />
+                android:src="@drawable/image_icone_outlined" />
 
             <TextView
                 android:id="@+id/post_likes_number"
                 android:layout_width="wrap_content"
+                android:layout_alignStart="@id/like_button"
+                android:paddingStart="10dp"
                 android:layout_height="wrap_content"
+                android:textAllCaps="false"
+                android:fontFamily="@font/arimo"
                 android:layout_below="@id/post_image"
                 android:layout_margin="5dp"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:id="@+id/post_comments_number"
@@ -86,14 +94,14 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_image"
                 android:fontFamily="@font/arimo"
-                android:layout_alignParentEnd="true"
+                android:layout_alignStart="@id/comment_button"
                 android:layout_margin="5dp"
                 android:textColor="@color/black" />
 
             <ImageButton
                 android:id="@+id/comment_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_likes_number"
                 android:layout_alignParentEnd="true"
@@ -109,7 +117,7 @@
             <ImageButton
                 android:id="@+id/like_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_likes_number"
                 android:layout_marginStart="8dp"
@@ -126,16 +134,19 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/like_button"
                 android:fontFamily="@font/arimo"
-                android:layout_marginStart="35dp"
+                android:layout_alignStart="@id/like_button"
+                android:paddingStart="25dp"
+                android:layout_margin="5dp"
                 android:text="@string/like" />
 
             <TextView
                 android:id="@+id/comment_text"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/comment_button"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="15dp"
+                android:paddingStart="10dp"
+                android:layout_margin="5dp"
+                android:layout_alignStart="@id/comment_button"
                 android:text="@string/comment" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

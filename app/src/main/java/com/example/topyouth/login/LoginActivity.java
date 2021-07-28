@@ -1,7 +1,6 @@
 package com.example.topyouth.login;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,29 +8,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
-
 import com.example.topyouth.R;
-import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
 import com.example.topyouth.utility_classes.Traveler;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import static com.example.topyouth.utility_classes.PasswordClassStuff.hasDigits;
-import static com.example.topyouth.utility_classes.PasswordClassStuff.hasSpecial;
-import static com.example.topyouth.utility_classes.PasswordClassStuff.isLongEnough;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "LoginActivity";
@@ -41,12 +29,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView register_new_user;
     private EditText et_email, et_pass;
     private TextView forgot_pass;
-    private ProgressBar progressBar;
-    private RelativeLayout loadingLayout, login_layout;
+    private RelativeLayout login_layout;
 
     //context
     private Context mContext;
-    private MessageDigest hashAlgo;
+    private FragmentManager fragmentManager;
 
     //firebase-auth
     private FirebaseAuthSingleton authSingleton;
@@ -55,20 +42,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     //utils
     private Traveler traveler = new Traveler();
-    private FragmentManager fragmentManager;
+    private MessageDigest hashAlgo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
-        mContext = getApplicationContext();
-        fragmentManager = getSupportFragmentManager();
-        try {
-            hashAlgo = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            Log.d(TAG, "onCreate: Hash-Algorithm exception: " + e.getLocalizedMessage());
-        }
-
         connectFirebase();
         inintWidgets();
         buttonListeners();
@@ -83,8 +62,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count < 8) {
                     button_login.setEnabled(false);
-                }
-                else button_login.setEnabled(true);
+                } else button_login.setEnabled(true);
             }
 
             @Override
@@ -97,7 +75,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void connectFirebase() {
-        authSingleton = FirebaseAuthSingleton.getInst(mContext);
+        mContext = getApplicationContext();
+        fragmentManager = getSupportFragmentManager();
+        try {
+            hashAlgo = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            Log.d(TAG, "onCreate: Hash-Algorithm exception: " + e.getLocalizedMessage());
+        }
+        authSingleton = FirebaseAuthSingleton.getInst(this);
         mAuth = authSingleton.mAuth();
         mUser = authSingleton.getCurrentUser();
 
@@ -115,9 +100,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         et_email = findViewById(R.id.email_field);
         et_pass = findViewById(R.id.pass_field);
         forgot_pass = findViewById(R.id.textViewforgot_pass);
-        progressBar = findViewById(R.id.loadingBar);
-        loadingLayout = findViewById(R.id.loading_layout);
         login_layout = findViewById(R.id.login_layout);
+
     }
 
     @Override
@@ -126,6 +110,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.button_login:
                 signIn();
                 break;
+
             case R.id.textViewforgot_pass:
                 // TODO: 6/3/21 open register fragmenet
                 Toast.makeText(mContext, "textViewforgot_pass is clicked", Toast.LENGTH_SHORT).show();
@@ -135,34 +120,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 // TODO: 6/6/21 open register fragment
                 Toast.makeText(mContext, "textView_register_new_user is clicked", Toast.LENGTH_SHORT).show();
                 traveler.goFragment(fragmentManager, new RegisterUser(), R.id.container);
-                login_layout.setVisibility(View.INVISIBLE);
-
+                login_layout.setVisibility(View.GONE);
                 break;
         }
     }
 
     private void signIn() {
-        String email = et_email.getText().toString();
-        String pass = et_pass.getText().toString();
-        byte[] passEncoded = hashAlgo.digest(pass.getBytes());
-        String p = new String(passEncoded);
+        final String email = et_email.getText().toString();
+        final String pass = et_pass.getText().toString();
+        final byte[] passEncoded = hashAlgo.digest(pass.getBytes());
+        final String p = new String(passEncoded);
+
         if (!email.isEmpty() && !pass.isEmpty()) {
-
-            login_layout.setVisibility(View.INVISIBLE);
-            loadingLayout.setVisibility(View.VISIBLE);
-            Task<AuthResult> authResultTask = authSingleton.signInWithEmailAndPassword(email, p);
-            if (!authResultTask.isSuccessful()) {
-                login_layout.setVisibility(View.VISIBLE);
-                loadingLayout.setVisibility(View.INVISIBLE);
-            }
-
-        }
-        else {
-            login_layout.setVisibility(View.VISIBLE);
-            loadingLayout.setVisibility(View.INVISIBLE);
-        }
+            authSingleton.signInWithEmailAndPassword(email, p);
+        } else
+            Toast.makeText(mContext, "Please provide the needed credentials.", Toast.LENGTH_SHORT).show();
 
     }
+
 
     @Override
     public void onBackPressed() {

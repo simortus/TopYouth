@@ -6,14 +6,16 @@
 
     <RelativeLayout
         android:id="@+id/userLayout"
+        android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <EditText
             android:id="@+id/postDetailsEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_margin="5dp"
-            android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
+            android:background="@drawable/edit_text_background"
             android:hint="@string/your_thoughts"
             android:padding="5dp">
 
@@ -25,8 +27,8 @@
             android:layout_height="180dp"
             android:layout_below="@id/postDetailsEditText"
             android:src="@drawable/image_icone_outlined"
-            android:elevation="4dp"
-            android:background="@drawable/button_design_selector_white"
+            android:elevation="5dp"
+            android:background="@drawable/round_edge_rectangle_button_recycler_view"
             android:clickable="true"
             android:focusable="true"
             android:onClick="onClick"
@@ -42,15 +44,16 @@
             android:layout_marginTop="?actionBarSize"
             android:onClick="onClick"
             android:src="@drawable/upload"
-            android:elevation="4dp"
+            android:elevation="5dp"
             android:text="@string/upload"
             android:fontFamily="@font/arimo"
+            android:textColor="@color/white"
             android:textAllCaps="false"
-            android:background="@drawable/round_edge_rectangle_for_buttons"
+            android:background="@drawable/button_design_selector_round_blue"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_marginLeft="?actionBarSize"
             android:layout_marginRight="?actionBarSize"
-            android:layout_width="100dp"
+            android:layout_width="150dp"
             android:layout_height="30dp">
         </Button>
 

@@ -9,20 +9,22 @@
     <RelativeLayout
         android:id="@+id/not_approved_layout"
         android:layout_width="match_parent"
+        android:background="@color/blue_fade"
         android:layout_height="match_parent"
-        android:background="@color/shadow_back"
         android:elevation="4dp">
 
         <TextView
-            style="@style/TextAppearance.AppCompat.Caption"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:fontFamily="@font/arimo"
+            style="@style/TextAppearance.AppCompat.Title"
             android:layout_centerInParent="true"
-            android:background="@color/yellowish"
             android:elevation="4dp"
             android:padding="5dp"
             android:text="@string/not_yet_approved_by_the_admin"
-            android:textColor="@color/blue_darkish"
+            android:textColor="@color/white"
+
             android:textStyle="italic">
 
         </TextView>

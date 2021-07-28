@@ -3,12 +3,8 @@ package com.example.topyouth.view_utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,21 +23,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
-import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.molde.Comments;
 import com.example.topyouth.molde.Likes;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
 import com.example.topyouth.utility_classes.DBSingelton;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,12 +43,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.zip.Inflater;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CardViewHolder> {
     private static final String TAG = "RecyclerViewAdapter";
@@ -160,8 +150,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
                 if (dataSnapshot.hasChildren()) {
                     final String numberofLikes = String.valueOf(dataSnapshot.getChildrenCount());
-                    Log.d(TAG, "onDataChange: number of likes: " + numberofLikes);
-                    holder.postLikeNumber.setText(numberofLikes);
+                    int likeNumbers = Integer.valueOf(numberofLikes);
+                    if (likeNumbers ==1){
+                        holder.postLikeNumber.setText(numberofLikes+" like");
+                    }
+                    if (likeNumbers > 1){
+                        holder.postLikeNumber.setText(numberofLikes+" likes");
+                    }
+
                 } else {
                     holder.postLikeNumber.setText(null);
                 }
@@ -369,7 +365,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
             alertDialog.getWindow().setAttributes(wlp);
             alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.getWindow().setBackgroundDrawable(mContext.getDrawable(R.drawable.button_design_selector_white));
+            alertDialog.getWindow().setBackgroundDrawable(mContext.getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
 //            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             alertDialog.show();
 
@@ -508,6 +504,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
 
             if (commentList.size() > 0) {
+
                 Comments currentComment = commentList.get(position);
                 Log.d(TAG, "getView: current comment: " + currentComment);
                 //setup comment details

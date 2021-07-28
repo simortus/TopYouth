@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void connectFirebase() {
-        authSingleton = FirebaseAuthSingleton.getInst(mContext);
+        authSingleton = FirebaseAuthSingleton.getInst(this);
         mAuth = authSingleton.mAuth();
         mUser = authSingleton.getCurrentUser();
         mAuthStateListener = firebaseAuth -> {

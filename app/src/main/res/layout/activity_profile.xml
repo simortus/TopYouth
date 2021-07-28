@@ -46,20 +46,22 @@
                 app:collapseIcon="@drawable/comment_icone1"
                 app:titleTextColor="@color/blue_darkish"/>
 
-
             <Button
                 android:id="@+id/saveButton"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:background="@color/yellowish"
+                android:layout_width="150dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/user_status"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/button_design_selector_round_blue"
                 android:enabled="false"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/arimo"
                 android:onClick="onClick"
                 android:text="@string/save"
+                android:layout_margin="5dp"
+                android:textColor="@color/white"
                 android:textAllCaps="false"
-                android:visibility="gone">
+                android:visibility="invisible">
 
             </Button>
 
@@ -114,13 +116,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="?actionBarSize"
         android:layout_gravity="start"
+        android:foregroundGravity="center"
         android:onClick="onClick"
-        android:background="@drawable/button_design_selector_blue"
+        android:background="@drawable/round_edge_rectangle_button_recycler_view"
         android:elevation="10dp"
         app:headerLayout="@layout/layout_nav_header"
         android:fadingEdge="horizontal|vertical"
         android:requiresFadingEdge="horizontal"
-        app:itemTextColor="@color/white"
+        app:itemTextColor="@color/blue_dark"
+        android:fontFamily="@font/arimo"
         app:menu="@menu/nav_bar_menu"
         app:itemHorizontalPadding="5dp"
         tools:context=".user_profile.User_Profile">

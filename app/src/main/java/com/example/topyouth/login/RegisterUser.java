@@ -48,7 +48,6 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
     private EditText email, pass, conf_pass;
     private Button register_button;
     private ProgressBar progressBar;
-    private RelativeLayout loading_layout, login_layout;
 
     //context
     private Context context;
@@ -65,14 +64,14 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
-        assert context !=null;
+        assert context != null;
         FirebaseApp.initializeApp(context);
         try {
             hashAlgo = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            Log.d(TAG, "onCreate: hashAlgo Exception: "+e.getLocalizedMessage());
+            Log.d(TAG, "onCreate: hashAlgo Exception: " + e.getLocalizedMessage());
         }
-        authSingleton = FirebaseAuthSingleton.getInst(context);
+        authSingleton = FirebaseAuthSingleton.getInst(this.getActivity());
         mAuth = authSingleton.mAuth();
 
     }
@@ -117,45 +116,34 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         conf_pass = view.findViewById(R.id.registerCPass_field);
         register_button = view.findViewById(R.id.button_register);
         progressBar = view.findViewById(R.id.loadingBar);
-        loading_layout = view.findViewById(R.id.loading_layout_register);
         register_button.setOnClickListener(this);
 
     }
 
     private void registerWithEmail() {
         //Todo continue here when you have free time . its a good practice
-        loading_layout.setVisibility(View.VISIBLE);
-        String mail = email.getText().toString();
-        String passWOrd = pass.getText().toString();
-        String confirmPass = conf_pass.getText().toString();
+
+        final String mail = email.getText().toString();
+        final String passWOrd = pass.getText().toString();
+        final String confirmPass = conf_pass.getText().toString();
         final byte[] passHash = hashAlgo.digest(passWOrd.getBytes());
         final byte[] confPassHash = hashAlgo.digest(confirmPass.getBytes());
 
-        if (!TextUtils.isEmpty(mail) && !TextUtils.isEmpty(passWOrd)  && !TextUtils.isEmpty(confirmPass) ){
+        if (!TextUtils.isEmpty(mail) && !TextUtils.isEmpty(passWOrd) && !TextUtils.isEmpty(confirmPass)) {
             if (isLongEnough(passWOrd) && hasDigits(passWOrd) && hasSpecial(passWOrd)) {
-                if (passWOrd.equals(confirmPass) && Arrays.equals(passHash, confPassHash)){
+                if (passWOrd.equals(confirmPass) && Arrays.equals(passHash, confPassHash)) {
                     Log.d(TAG, "registerWithEmail: everything is ok");
-                    String p = new String(passHash);
-                    Task<AuthResult> createUserTask = authSingleton.createUserWithEmailAndPassword(mail, p);
-                    if (createUserTask.isSuccessful()){
-                        loading_layout.setVisibility(View.INVISIBLE);
-                    }
-                    else {
-                        loading_layout.setVisibility(View.INVISIBLE);
-                    }
-                }
-                else {
-                    loading_layout.setVisibility(View.INVISIBLE);
+                    final String p = new String(passHash);
+                    authSingleton.createUserWithEmailAndPassword(mail, p);
+
+                } else {
                     Toast.makeText(getContext(), "Error: Password must match confirm password. Try again", Toast.LENGTH_SHORT).show();
                 }
 
+            } else {
+                Toast.makeText(context, "Please chose a strong password, with digits, uppercase letter and special characters", Toast.LENGTH_SHORT).show();
             }
-            else {
-                Toast.makeText(context,"Please chose a strong password, with digits, uppercase letter and special characters",Toast.LENGTH_SHORT).show();
-            }
-        }
-        else {
-            loading_layout.setVisibility(View.INVISIBLE);
+        } else {
             Toast.makeText(getContext(), "All fields are required. Try again", Toast.LENGTH_SHORT).show();
         }
 

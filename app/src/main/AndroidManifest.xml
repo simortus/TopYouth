@@ -4,22 +4,22 @@
     package="com.example.topyouth">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-<!--    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />-->
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/top_youth_logo_icone"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:isGame="false"
+        android:roundIcon="@mipmap/top_youth_logo_icone"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".user_profile.UserProfileActivity"/>
+        <activity android:name=".user_profile.UserProfileActivity" />
         <activity android:name=".add_post.AddPostActivity" />
         <activity android:name=".login.LoginActivity">
             <intent-filter>
@@ -35,6 +35,11 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+<!--        &lt;!&ndash;Add the app ID by using the <meta-data> tag &ndash;&gt;-->
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
+<!--            android:value="ca-app-pub-3940256099942544~3347511713"/>-->
     </application>
 
 </manifest>

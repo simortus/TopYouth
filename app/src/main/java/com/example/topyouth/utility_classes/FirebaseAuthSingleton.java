@@ -1,14 +1,21 @@
 package com.example.topyouth.utility_classes;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
@@ -43,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  **/
 public class FirebaseAuthSingleton extends FirebaseAuth {
     private static final String TAG = "AuthSingleton";
-    private Context mContext;
+    private Activity mContext;
     //<<----- auth, DB---->>
     private final static FirebaseAuth myAuth = FirebaseAuth.getInstance();
     private static FirebaseUser mCurrentUser;
@@ -55,17 +62,19 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
 
     //vars
     private final Traveler mTraveler = new Traveler();
+    private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog alertDialog;
 
     //<<------methods--------->>
-    private FirebaseAuthSingleton(@NonNull Context context) {
+    private FirebaseAuthSingleton(@NonNull Activity activity) {
         super(FirebaseApp.getInstance());
-        this.mContext = context;
+        this.mContext = activity;
     }
 
     //singleton of this class
-    public static FirebaseAuthSingleton getInst(@NonNull Context context) {
+    public static FirebaseAuthSingleton getInst(@NonNull Activity activity) {
         if (myAuth != null) {
-            return new FirebaseAuthSingleton(context);
+            return new FirebaseAuthSingleton(activity);
         } else
             return null;
     }
@@ -96,11 +105,12 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
                 addNewUser(email, userUid);
 
             } else {
+                closeDial();
                 signOut();//todo: Mo's notes: security stuff: close auth and databases connections when things are canceled or failed
-//                    mDatabase.goOffline();//todo: Mo's notes: security stuff: close auth and databases connections when things are canceled or failed
                 Toast.makeText(context, "Please verify your account.", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
+            closeDial();
             Log.d(TAG, "verifyAccount: error: " + e.getMessage());
             Toast.makeText(context, "Something went wrong..." + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             signOut();
@@ -121,9 +131,11 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
             if (documentSnapshot.exists()) {
                 Log.d(TAG, "getDocumentForUSer: documentSnapshot id: " + documentSnapshot.getId());
                 //todo here we check if the shared pref is true for phone verified
+                closeDial();
                 mTraveler.gotoWithFlags(mContext, MainActivity.class);
             }
         }).addOnFailureListener(e -> {
+            closeDial();
             Log.d(TAG, "onFailure: not worked: " + e.getMessage());
         });
 
@@ -144,8 +156,8 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
                 }
 
             });
-        }catch (Exception e){
-            Log.d(TAG, "checkApproved: Exception: "+e.getLocalizedMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "checkApproved: Exception: " + e.getLocalizedMessage());
         }
     }
 
@@ -157,20 +169,23 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
         map.put("status", "not_approved");
         mFirestore.collection("app_us").document(userId).set(map).addOnSuccessListener(documentReference -> {
             Log.d(TAG, "onSuccess: Successful operation: " + documentReference);
+            closeDial();
             mTraveler.gotoWithFlags(mContext, MainActivity.class);
 
-        }).addOnFailureListener(e ->
-                Log.d(TAG, "onFailure: not worked: " + e.getMessage()));
+        }).addOnFailureListener(e ->{
+            closeDial();
+            Log.d(TAG, "onFailure: not worked: " + e.getMessage());
+        });
+
     }
 
     // //  works like a charm
     private void addNewUser(@NonNull final String email, @NonNull final String user_id) {
         final String name = "no_name",
-                phone = "no_phone",
                 profileUrl = "no_url",
                 about = "no_details";
         //todo Mo's: this is to prevent malicious users from trying to skip the phone confirmation, by trying to add a phone number at this step
-        final TopUser topUser = new TopUser(user_id, email, name, profileUrl, about );
+        final TopUser topUser = new TopUser(user_id, email, name, profileUrl, about);
         DatabaseReference user_ref = mDbSingleton.getUsers_ref();
         Query query = user_ref.orderByKey().equalTo(user_id);
         query.limitToFirst(1);
@@ -188,8 +203,12 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
                             getDocumentForUSer(user_id, email);
                         }
 
-                    }).addOnFailureListener(e ->
-                            Log.d(TAG, "onFailure: DB_adding user_error: " + e.getMessage()));
+                    }).addOnFailureListener(e -> {
+                                closeDial();
+                                Log.d(TAG, "onFailure: DB_adding user_error: " + e.getMessage());
+
+                            });
+
 
                 } else {
                     //Todo: since we decided to do phone verification always to enhance security
@@ -199,19 +218,40 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                closeDial();
                 Log.d(TAG, "onCancelled: auth_error: " + error.getMessage());
             }
         });
     }
 
     private String provider(String s) {
-        final String ss = s;
-        return ss;
+        return s;
+    }
+
+    private void showDialog() {
+        alertDialogBuilder = new AlertDialog.Builder(mContext);
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
+        wlp.gravity = Gravity.CENTER;
+        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        alertDialog.getWindow().setAttributes(wlp);
+        alertDialog.getWindow().setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
+
+        View layoutView = mContext.getLayoutInflater().inflate(R.layout.layout_loading_dialog, null);
+        alertDialog.setView(layoutView);
+        alertDialog.show();
+    }
+
+    private void closeDial() {
+        alertDialog.dismiss();
     }
 
     @NonNull
     @Override
     public Task<AuthResult> signInWithEmailAndPassword(@NonNull final String email, @NonNull final String pass) {
+        showDialog();
         return myAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(task1 -> {
             if (task1.isSuccessful()) {
                 mCurrentUser = task1.getResult().getUser();
@@ -221,15 +261,16 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
                         final String provider = provider(providerTask.getResult().getSignInProvider());
                         Log.d(TAG, "signInWithEmailAndPassword: provider: " + provider);
                         verifyAccount(mCurrentUser, mContext, provider);
-
                     }
 
                 } catch (Exception e) {
+                    closeDial();
                     signOut();
                     Log.d(TAG, "signInWithEmailAndPassword: task_waiting_error: " + e.getMessage());
                 }
             }
         }).addOnFailureListener(e -> {
+            closeDial();
             Log.d(TAG, "signInWithEmailAndPassword: Auth_Error: " + e.getMessage());
             Toast.makeText(mContext, "Login error; " + e.getMessage(), Toast.LENGTH_SHORT).show();
             signOut();
@@ -272,6 +313,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
             if (task.isSuccessful()) {
                 Log.d(TAG, "sendEmailVer: task is success: " + task.isSuccessful());
                 Toast.makeText(mContext, "We sent you an email verification, check your inbox and click on th link to verify", Toast.LENGTH_SHORT).show();
+               closeDial();
                 new Handler().postDelayed(() -> {
                     mTraveler.gotoWithFlags(mContext, LoginActivity.class);
                     signOut();
@@ -279,6 +321,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
             }
 
         }).addOnFailureListener(e -> {
+            closeDial();
             Toast.makeText(mContext, "Email not sent! " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.d(TAG, "verifyUser: Auth_errror: " + e.getMessage());
             signOut();
@@ -401,6 +444,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     @NonNull
     @Override
     public Task<AuthResult> createUserWithEmailAndPassword(@NonNull String email, @NonNull String pass) {
+        showDialog();
         Task<AuthResult> task = myAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(task1 -> {
             if (task1.isSuccessful()) {
                 FirebaseUser user = task1.getResult().getUser();
@@ -408,6 +452,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
             }
 
         }).addOnFailureListener(e -> {
+            closeDial();
             Toast.makeText(mContext, "Registration failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             signOut();
             Log.d(TAG, "createUserWithEmailAndPassword: Auth_error: " + e.getMessage());

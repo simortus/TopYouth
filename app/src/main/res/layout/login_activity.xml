@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,31 +14,10 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/loading_layout"
-            android:layout_width="match_parent"
-            android:elevation="5dp"
-            android:layout_height="match_parent"
-            android:background="@color/shadow_back"
-            android:visibility="invisible">
-
-            <ProgressBar
-                android:id="@+id/loadingBar"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true"
-                android:progressTint="@color/blue_darkish"
-                android:visibility="visible"
-                app:layout_constraintVertical_bias="0.3" />
-        </RelativeLayout>
-
-
-        <RelativeLayout
             android:id="@+id/login_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/fade_grey"
-            android:visibility="visible">
+            android:background="@color/fade_grey">
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/top_youth_logo"
@@ -67,7 +47,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="50dp"
-                android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
+                android:background="@drawable/edit_text_background"
                 android:elevation="4dp"
                 android:hint="@string/type_in_your_email"
                 android:inputType="textEmailAddress"
@@ -87,7 +67,7 @@
                 android:layout_marginStart="50dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="50dp"
-                android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
+                android:background="@drawable/edit_text_background"
                 android:hint="@string/type_in_your_password"
                 android:inputType="textPassword"
                 android:maxEms="30"
@@ -100,15 +80,16 @@
 
             <Button
                 android:id="@+id/button_login"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="30dp"
                 android:layout_below="@id/pass_field"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="10dp"
-                android:fontFamily="@font/arimo"
                 android:layout_marginEnd="100dp"
-                android:background="@drawable/button_design_selector_white"
+                android:background="@drawable/button_design_selector_round_blue"
                 android:elevation="5dp"
+                android:fontFamily="@font/arimo"
+                android:textColor="@color/white"
                 android:onClick="onClick"
                 android:text="@string/login"
                 android:textAllCaps="false" />
@@ -123,6 +104,7 @@
                 android:layout_marginBottom="5dp"
                 android:clickable="true"
                 android:focusable="true"
+                android:fontFamily="@font/roboto"
                 android:onClick="onClick"
                 android:text="@string/forgotten_password_click_here"
                 android:textColor="@color/colorAccent"
@@ -137,11 +119,14 @@
                 android:layout_marginTop="?actionBarSize"
                 android:clickable="true"
                 android:focusable="true"
+                android:fontFamily="@font/roboto"
                 android:onClick="onClick"
                 android:text="@string/have_no_account"
                 android:textColor="@color/black"
                 android:textStyle="italic" />
 
         </RelativeLayout>
+
     </FrameLayout>
 </LinearLayout>
+

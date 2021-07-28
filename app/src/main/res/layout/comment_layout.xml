@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -13,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
+            android:background="@drawable/edit_text_background"
             android:hint="@string/your_thoughts"
             android:inputType="textMultiLine"
             android:padding="8sp"
@@ -23,11 +24,10 @@
         <Button
             android:id="@+id/commentLayout_sendButton"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="100dp"
+            android:layout_width="150dp"
             android:layout_height="30dp"
             android:layout_below="@id/commentLayout_edit_text"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="?actionBarSize"
+            android:layout_margin="10dp"
             android:elevation="5dp"
             android:padding="5dp"
             android:text="@string/send"
@@ -35,28 +35,28 @@
             android:fontFamily="@font/arimo"
             android:layout_marginBottom="10dp"
             android:requiresFadingEdge="horizontal|vertical"
-            android:background="@drawable/button_design_selector_white"
+            android:background="@drawable/button_design_selector_round_blue"
             android:clickable="true"
+            android:textColor="@color/white"
             android:focusable="true"
-            android:fadingEdge="vertical|horizontal"
-            />
+            android:fadingEdge="vertical|horizontal" />
 
         <Button
             android:id="@+id/commentLayout_cancelButton"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="100dp"
+            android:layout_width="150dp"
             android:layout_height="30dp"
+            android:textColor="@color/white"
             android:layout_below="@id/commentLayout_edit_text"
             android:layout_alignParentEnd="true"
             android:elevation="5dp"
             android:textAllCaps="false"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="?actionBarSize"
+            android:layout_margin="10dp"
             android:fontFamily="@font/arimo"
             android:text="@string/discard"
             android:layout_marginBottom="10dp"
             android:fadingEdge="vertical|horizontal"
-            android:background="@drawable/button_design_selector_white"
+            android:background="@drawable/button_design_selector_round_blue"
             >
 
         </Button>

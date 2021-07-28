@@ -34,9 +34,6 @@ import com.example.topyouth.utility_classes.MediaStuff;
 import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -104,7 +101,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void connectFirebase() {
-        authSingleton = FirebaseAuthSingleton.getInst(context);
+        authSingleton = FirebaseAuthSingleton.getInst(this);
         auth = authSingleton.mAuth();
         mUser = authSingleton.getCurrentUser();
         dbSingelton = DBSingelton.getInstance();
@@ -389,7 +386,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         wlp.gravity = Gravity.CENTER;
         wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
         alertDialog.getWindow().setAttributes(wlp);
-        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_design_selector_white));
+        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
 
         View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
         TextView dialogTitle = layoutView.findViewById(R.id.dialogTitleTextView);
@@ -477,7 +474,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         wlp.gravity = Gravity.CENTER;
         wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
         alertDialog.getWindow().setAttributes(wlp);
-        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_design_selector_white));
+        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
 
         View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
         Button confirmButton = layoutView.findViewById(R.id.confirmButton);
@@ -486,9 +483,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
         confirmButton.setOnClickListener(v -> {
             authSingleton.signOut();
+            alertDialog.dismiss();
             new Traveler().gotoWithFlags(context, LoginActivity.class);
             finish();
-            alertDialog.dismiss();
         });
         cancelButton.setOnClickListener(v -> {
             alertDialog.dismiss();

@@ -296,7 +296,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private void connectFirebase() {
-        authSingleton = FirebaseAuthSingleton.getInst(context);
+        authSingleton = FirebaseAuthSingleton.getInst(this);
         mAuth = authSingleton.mAuth();
         mUser = authSingleton.getCurrentUser();
         dbSingelton = DBSingelton.getInstance();
