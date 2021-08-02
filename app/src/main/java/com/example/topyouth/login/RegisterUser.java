@@ -47,7 +47,6 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
     // view
     private EditText email, pass, conf_pass;
     private Button register_button;
-    private ProgressBar progressBar;
 
     //context
     private Context context;
@@ -115,14 +114,12 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         pass = view.findViewById(R.id.pass_field);
         conf_pass = view.findViewById(R.id.registerCPass_field);
         register_button = view.findViewById(R.id.button_register);
-        progressBar = view.findViewById(R.id.loadingBar);
         register_button.setOnClickListener(this);
 
     }
 
     private void registerWithEmail() {
         //Todo continue here when you have free time . its a good practice
-
         final String mail = email.getText().toString();
         final String passWOrd = pass.getText().toString();
         final String confirmPass = conf_pass.getText().toString();

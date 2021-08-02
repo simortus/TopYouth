@@ -1,17 +1,20 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/blue_rectangle_sharp_blue_edge"
-        android:layout_alignParentBottom="true">
+        android:layout_height="wrap_content"
+        >
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
-            android:layout_height="?actionBarSize"
+            android:layout_height="@android:dimen/app_icon_size"
+            style="@style/Widget.MaterialComponents.ActionBar.Solid"
+            android:theme="@style/AppTheme"
             app:menu="@menu/menu_items"
-            app:itemBackground="@color/yellowish"
+            android:elevation="5dp"
+            android:background="@color/yellow_fade_recy"
             android:id="@+id/bottomNavigationBar">
 
         </com.google.android.material.bottomnavigation.BottomNavigationView>

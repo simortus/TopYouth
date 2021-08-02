@@ -8,22 +8,38 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:layoutMode="clipBounds"
         android:id="@+id/userLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/post_item_layout"
             android:background="@color/white"
+            tools:itemCount="1"
             android:elevation="4dp"
-            android:padding="1px">
-        </androidx.recyclerview.widget.RecyclerView>
+            android:padding="1px"
+            tools:listitem="@layout/post_item_layout" />
 
     </RelativeLayout>
+<!--    <include-->
+<!--        layout="@layout/add_item_post_layout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="?actionBarSize">-->
+<!--    </include>-->
 
+<!--    <RelativeLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="?actionBarSize">-->
+
+<!--        <include-->
+<!--            android:layout_below="@id/userLayout"-->
+<!--            layout="@layout/add_item_post_layout"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"/>-->
+<!--    </RelativeLayout>-->
 
 
 </LinearLayout>

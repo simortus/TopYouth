@@ -53,4 +53,6 @@
     <string name="discard">Discard</string>
     <string name="upload">Upload</string>
     <string name="loading_please_wait">Loading, please wait…</string>
+    <string name="click_image_to_add_media">Click image to add media</string>
+    <string name="check_internet">Please verify your internet connection</string>
 </resources>

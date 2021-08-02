@@ -11,29 +11,36 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
 import com.example.topyouth.login.LoginActivity;
+import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
 import com.example.topyouth.utility_classes.DBSingelton;
 import com.example.topyouth.utility_classes.MediaStuff;
 import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
+import com.example.topyouth.view_utils.GridImageAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,6 +57,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -57,6 +66,7 @@ import static com.example.topyouth.utility_classes.MediaStuff.CAMERA_REQUEST;
 
 public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "UserProfileActivity";
+    private static final int NUM_GRID_COLUMNS = 3;
 
     //view
     private BottomNavigationView bottomNavigationView;
@@ -67,11 +77,14 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private View nav_header_view;
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
+    private GridView gridView;
 
 
     //navigation handlers
     private BottomNavigationHandler bottomNavigationHandler;
     private Context context;
+    private Activity currentActvitiy;
+    private GridImageAdapter adapter;
 
     //firebase
     private FirebaseAuthSingleton authSingleton;
@@ -86,18 +99,19 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private MediaStuff mediaStuff;
     private Executor executor = Executors.newCachedThreadPool();
     private Uri mUri;
+    private List<String> bitmaps = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         context = getApplicationContext();
+        currentActvitiy = this;
         mediaStuff = new MediaStuff(this);
         connectFirebase();
         widgets();
-
-        bottomNavigationHandler = new BottomNavigationHandler(context, bottomNavigationView);
-        bottomNavigationHandler.navigation();
+        setupGridView();
     }
 
     private void connectFirebase() {
@@ -112,18 +126,27 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
 
     private void widgets() {
+        //findView by ID
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
         status = findViewById(R.id.user_status);
         profileImage = findViewById(R.id.profilePic);
         username = findViewById(R.id.username);
         saveButton = findViewById(R.id.saveButton);
-        profileImage.setOnClickListener(this);
-        saveButton.setOnClickListener(this);
-
-
+        gridView = findViewById(R.id.gridView);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mNavigationView = findViewById(R.id.nav_view);
         toolbar = findViewById(R.id.toolBar);
+
+        adapter = new GridImageAdapter(context, R.layout.layout_grid_imageview, bitmaps);
+        gridView.setAdapter(adapter);
+
+        //bottomNav handlers
+        bottomNavigationHandler = new BottomNavigationHandler(currentActvitiy, bottomNavigationView);
+        bottomNavigationHandler.navigation();
+        MenuItem userItem = bottomNavigationView.getMenu().getItem(2);
+        userItem.setChecked(true);
+
+
         //heaDER_LAYOUT
         nav_header_view = mNavigationView.getHeaderView(0);
         emailHeader = nav_header_view.findViewById(R.id.textView_emailDisplay_header);
@@ -137,8 +160,71 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         setUserInfo();
 
         mNavigationView.setOnClickListener(this);
+        profileImage.setOnClickListener(this);
+        saveButton.setOnClickListener(this);
         navigationViewClickListener();
 
+        gridviewClickListener();
+
+    }
+
+    private void gridviewClickListener() {
+        gridView.setOnItemClickListener((parent, view, position, id) -> {//<-clicklistener on position in gridView-->
+            Toast.makeText(context, "Item clicked: " + bitmaps.get(position) + id, Toast.LENGTH_SHORT).show();
+        });
+    }
+
+
+    /**
+     *
+     **/
+    private void setupGridView() {
+        Runnable gridViewRunnable = () -> {
+            try {
+                final String user_id = mUser.getUid();
+                final DatabaseReference thisUserPosts = dbSingelton.getPostsRef();
+
+                final Query postsQuery = thisUserPosts.child(user_id);
+                postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.d(TAG, "setupGridView onDataChange: datasnapshot.key: " + dataSnapshot.getKey());
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            PostModel postModel = ds.getValue(PostModel.class);
+                            Log.d(TAG, "setupGridView onDataChange: " + postModel.getPostDetails());
+                            bitmaps.add(postModel.getImageUrl());
+
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d(TAG, "setupGridView: error; " + databaseError.getMessage());//<-catch exception to prevent app crush -->
+
+                    }
+                });
+
+
+//                PostModel p_Profile = new PostModel();
+//                final List<PostModel> postList = new ArrayList<>();//<-setup grid view -->
+//                postList.add(p_Profile);
+//                int gridWidth = getResources().getDisplayMetrics().widthPixels;
+//                int imageWidth = gridWidth / NUM_GRID_COLUMNS;
+//                gridView.setColumnWidth(imageWidth);
+//
+//                gridView.setAdapter(adapter);
+//                adapter.notifyDataSetChanged();
+
+            } catch (Exception e) {
+                Log.d(TAG, "setupGridView: error; " + e.getMessage());//<-catch exception to prevent app crush -->
+            }
+        };
+        if (authSingleton.checkInternetConnection()) {
+            executor.execute(gridViewRunnable);
+        } else {
+            Toast.makeText(context, R.string.check_internet, Toast.LENGTH_SHORT).show();//<-Notify user to check internet-->
+        }
     }
 
     @Override
@@ -484,7 +570,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         confirmButton.setOnClickListener(v -> {
             authSingleton.signOut();
             alertDialog.dismiss();
-            new Traveler().gotoWithFlags(context, LoginActivity.class);
+            new Traveler().gotoWithFlags(this, LoginActivity.class);
             finish();
         });
         cancelButton.setOnClickListener(v -> {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@android:dimen/app_icon_size"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:background="@color/yellow_fade_recy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/add_media_image"
+            android:layout_centerVertical="true"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="@android:dimen/app_icon_size"
+            android:layout_height="@android:dimen/app_icon_size"
+            android:src="@drawable/add_plus_icone" />
+
+        <EditText
+            android:id="@+id/add_post_editText"
+            android:hint="@string/your_thoughts"
+            android:fontFamily="@font/arimo"
+            android:textAllCaps="false"
+            android:layout_marginStart="@dimen/cardview_default_radius"
+            android:layout_marginEnd="@dimen/cardview_default_radius"
+            android:layout_centerVertical="true"
+            android:textAlignment="center"
+            android:inputType="textMultiLine"
+            android:layout_toEndOf="@id/add_media_image"
+            android:background="@drawable/edit_text_background"
+            android:layout_width="match_parent"
+            android:layout_height="@android:dimen/app_icon_size" />
+    </RelativeLayout>
+
+</LinearLayout>

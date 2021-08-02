@@ -13,18 +13,30 @@
             android:id="@+id/postDetailsEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
+            android:inputType="textMultiLine"
             android:layout_margin="5dp"
             android:background="@drawable/edit_text_background"
             android:hint="@string/your_thoughts"
-            android:padding="5dp">
+            android:padding="5dp"/>
 
-        </EditText>
+        <TextView
+            android:layout_below="@id/postImageView"
+            android:text="@string/click_image_to_add_media"
+            android:textAlignment="center"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:fontFamily="@font/arimo"
+            android:textColor="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
 
         <ImageView
             android:id="@+id/postImageView"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginStart="?actionBarSize"
+            android:layout_marginEnd="?actionBarSize"
             android:layout_below="@id/postDetailsEditText"
             android:src="@drawable/image_icone_outlined"
             android:elevation="5dp"
@@ -32,8 +44,8 @@
             android:clickable="true"
             android:focusable="true"
             android:onClick="onClick"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="5dp">
+            android:layout_marginTop="?actionBarSize"
+            android:layout_centerHorizontal="true">
 
         </ImageView>
 

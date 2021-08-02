@@ -1,12 +1,16 @@
 package com.example.topyouth.view_utils;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.app.Activity;
+import android.content.res.ColorStateList;
+import android.os.Build;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.example.topyouth.R;
 import com.example.topyouth.add_post.AddPostActivity;
@@ -18,71 +22,94 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class BottomNavigationHandler {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class BottomNavigationHandler extends BottomNavigationView {
     private static final String TAG = "BottomNavigationHandler";
-    private BottomNavigationView bottomNavigationViewEx;
-    private Context context;
+    private BottomNavigationView navigationView;
+    private Activity context;
     private Traveler traveler = new Traveler();
 
     private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
 
-    public BottomNavigationHandler(@NonNull Context context, BottomNavigationView bnv) {
+    public BottomNavigationHandler(@NonNull Activity context, BottomNavigationView bnv) {
+        super(context);
         this.context = context;
-        this.bottomNavigationViewEx = bnv;
-        bottomNavigationViewEx.setItemHorizontalTranslationEnabled(true);
-//        bottomNavigationViewEx.animate();
+        this.navigationView = bnv;
+        navigationView.setItemHorizontalTranslationEnabled(true);
     }
 
     @SuppressLint("NonConstantResourceId")
     public void navigation() {
-        bottomNavigationViewEx.setOnNavigationItemSelectedListener(item -> {
+        navigationView.setOnNavigationItemSelectedListener(item -> {
+            final String activityClassNAme = context.getLocalClassName();
+            Log.d(TAG, "navigation: activityClassNAme: "+activityClassNAme);
             switch (item.getItemId()) {
                 case R.id.home_icone:
-                    Log.d(TAG, "onNavigationItemSelected: home");
-                    traveler.gotoWithFlags(context, MainActivity.class);
+                    if (!activityClassNAme.contains("home.MainActivity")) {
+                        traveler.gotoWithFlags(context, MainActivity.class);
+                    }
+
                     break;
                 case R.id.addPost:
-                    Log.d(TAG, "onNavigationItemSelected: addPost");
-                    traveler.gotoWithFlags(context, AddPostActivity.class);
+                    if (!activityClassNAme.contains("add_post.AddPostActivity")) {
+                        traveler.gotoWithFlags(context, AddPostActivity.class);
+                    }
+
                     break;
                 case R.id.profile:
-                    Log.d(TAG, "onNavigationItemSelected: profile");
-                    traveler.gotoWithFlags(context, UserProfileActivity.class);
+                    if (!activityClassNAme.contains("user_profile.UserProfileActivity")) {
+                        traveler.gotoWithFlags(context, UserProfileActivity.class);
+                    }
+
                     break;
 
             }
-            return false;
+            return true;
         });
     }
 
     public void isAdminApproved(@NonNull final FirebaseUser mUser, @NonNull final RelativeLayout notApprovedLayout, @NonNull final RelativeLayout userLayout) {
-        try {
-            final String user_id = mUser.getUid();
-            DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
-            not_approved_users.addSnapshotListener((value, error) -> {
-                if ( value != null && error == null) {
-                    Log.d(TAG, "onEvent: Document value_id: " + value.getId());
-                    Log.d(TAG, "onEvent: Document value_approved_status: " + value.get("status"));
-                    final String status = (String) value.get("status");
-                    Log.d(TAG, "isAdminApproved: status: " + status);
-                    boolean iss = status.equalsIgnoreCase("approved");
-                    if (iss) {
-                        notApprovedLayout.setVisibility(View.GONE);
-                        userLayout.setVisibility(View.VISIBLE);
-                        userLayout.setClickable(false);
-                        userLayout.setFocusable(false);
+        ExecutorService executors = Executors.newCachedThreadPool();
+        Runnable isApproved = () -> {
+            try {
+                final String user_id = mUser.getUid();
+                DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
+                not_approved_users.addSnapshotListener((value, error) -> {
+                    if (value != null && error == null) {
+                        Log.d(TAG, "onEvent: Document value_id: " + value.getId());
+                        Log.d(TAG, "onEvent: Document value_approved_status: " + value.get("status"));
+                        final String status = (String) value.get("status");
+                        Log.d(TAG, "isAdminApproved: status: " + status);
+                        boolean iss = status.equalsIgnoreCase("approved");
+                        if (iss) {
+                            notApprovedLayout.setVisibility(View.GONE);
+                            userLayout.setVisibility(View.VISIBLE);
+                            userLayout.setClickable(false);
+                            userLayout.setFocusable(false);
+                        } else {
+                            notApprovedLayout.setVisibility(View.VISIBLE);
+                            userLayout.setVisibility(View.GONE);
+                            userLayout.setClickable(true);
+                            userLayout.setFocusable(true);
+                        }
                     }
-                    else {
-                        notApprovedLayout.setVisibility(View.VISIBLE);
-                        userLayout.setVisibility(View.GONE);
-                        userLayout.setClickable(true);
-                        userLayout.setFocusable(true);
-                    }
-                }
-            });
+                });
 
-        } catch (Exception e) {
-            Log.d(TAG, "isAdminApproved_Exception: " + e.getLocalizedMessage());
+            } catch (Exception e) {
+                Log.d(TAG, "isAdminApproved_Exception: " + e.getLocalizedMessage());
+            }
+        };
+        synchronized (this) {
+            try {
+                this.wait(500);
+                executors.execute(isApproved);
+            } catch (InterruptedException e) {
+                Log.d(TAG, "isAdminApproved: Exeception: " + e.getMessage());
+            }
         }
+
+
     }
 }

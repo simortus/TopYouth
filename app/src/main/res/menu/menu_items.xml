@@ -2,16 +2,17 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group>
+    <group
+        >
 
         <item android:id="@+id/home_icone"
             android:elevation="5dp"
-            android:icon="@drawable/home"
+            android:icon="@drawable/home_selected"
             android:title="@string/journal"/>
 
         <item android:id="@+id/addPost"
             android:elevation="5dp"
-            android:icon="@drawable/add"
+            android:icon="@drawable/add_plus_icone"
             android:title="@string/post"/>
 
         <item android:id="@+id/profile"

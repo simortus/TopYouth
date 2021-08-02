@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RelativeLayout;
@@ -72,13 +74,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
         findWidgets();
-        viewAdapter = new RecyclerViewAdapter(this, postList, postOwnerList);
-
-        recyclerViewer.setAdapter(viewAdapter);
 
 
         connectFirebase();
-        bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
+
 
     }
 
@@ -86,9 +85,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         notApprovedLayout = findViewById(R.id.not_approved_layout);
         userLayout = findViewById(R.id.userLayout);
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
-        bottomNavigationHandler = new BottomNavigationHandler(mContext, bottomNavigationView);
+        bottomNavigationHandler = new BottomNavigationHandler(this, bottomNavigationView);
         bottomNavigationHandler.navigation();
         recyclerViewer = findViewById(R.id.recyclerViewer);
+        viewAdapter = new RecyclerViewAdapter(this, postList, postOwnerList);
+        recyclerViewer.setAdapter(viewAdapter);
 
 
     }
@@ -102,6 +103,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         dbSingelton = DBSingelton.getInstance();
         database = dbSingelton.getDbInstance();
+        bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
+        MenuItem homeItem = bottomNavigationView.getMenu().getItem(0);
+        homeItem.getIcon().setTint(getResources().getColor(R.color.yellowish));
+        homeItem.setChecked(true);
+
         Runnable one = this::readPosts;
         Runnable two = this::setUpRecyclerView;
 

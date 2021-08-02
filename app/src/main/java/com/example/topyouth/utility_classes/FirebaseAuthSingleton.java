@@ -3,6 +3,7 @@ package com.example.topyouth.utility_classes;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -86,6 +87,14 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     public boolean isUserCompliant(FirebaseUser currentUser) {
         return currentUser != null && currentUser.isEmailVerified() && !currentUser.isAnonymous();
     }
+
+    public boolean checkInternetConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return connectivityManager.getActiveNetworkInfo() != null &&
+                connectivityManager.getActiveNetworkInfo().isAvailable() &&
+                connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
 
     @Override
     public void signOut() {

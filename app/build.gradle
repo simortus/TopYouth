@@ -49,6 +49,9 @@ dependencies {
         exclude group: "com.top_youth_background_logo.support" }
     implementation 'com.google.android.material:material:1.2.0-alpha03'
 
+    //transition-animation library
+//    implementation 'com.github.hajiyevelnur92:intentanimation:1.+'
+
     //ads banner
 //    implementation 'com.google.android.gms:play-services-ads:18.3.0'
 

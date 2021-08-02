@@ -102,7 +102,9 @@
             <GridView
                 android:id="@+id/gridView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                tools:listitem="@layout/layout_grid_imageview"
                 android:elevation="4dp"
                 android:numColumns="3">
 

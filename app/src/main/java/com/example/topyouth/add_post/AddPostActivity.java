@@ -7,15 +7,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -95,6 +98,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     private TopUser currentTopUser;
     private final Traveler traveler = new Traveler();
     private MediaStuff mediaStuff;
+    private Activity currentActivity;
 
     private TopUser getCurrentTopUser() {
         return currentTopUser;
@@ -108,15 +112,12 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_post);
-        context = this;
+        context = getApplicationContext();
+        currentActivity = this;
         mediaStuff = new MediaStuff(this);
-        widgets();
+        mediaStuff.checkPermissions(this);
         connectFirebase();
-
-        bottomNavigationHandler = new BottomNavigationHandler(context, bottomNavigationView);
-        bottomNavigationHandler.navigation();
-        bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
-        MediaStuff.checkPermissions(this);
+        widgets();
 
     }
 
@@ -265,7 +266,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
                             postImage.setImageDrawable(getResources().getDrawable(R.color.yellowish));
                             postImage.refreshDrawableState();
                             postDetails.clearComposingText();
-                            traveler.gotoWithFlags(context, MainActivity.class);
+                            traveler.gotoWithFlags(currentActivity, MainActivity.class);
                         }
                     }).addOnFailureListener(e ->
                             Log.d(TAG, "onFailure: Exception: " + e.getLocalizedMessage()));
@@ -281,6 +282,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void widgets() {
+        //find views
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
         notApprovedLayout = findViewById(R.id.not_approved_layout);
         userLayout = findViewById(R.id.userLayout);
@@ -292,6 +294,15 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
         //click listeners
         postImage.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
+
+
+        //bottom navigation handler
+        bottomNavigationHandler = new BottomNavigationHandler(this, bottomNavigationView);
+        bottomNavigationHandler.navigation();
+        bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
+        MenuItem addItem = bottomNavigationView.getMenu().getItem(1);
+        addItem.setChecked(true);
+        addItem.getIcon().setTint(getResources().getColor(R.color.yellowish));
     }
 
 

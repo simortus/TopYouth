@@ -8,12 +8,19 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
 import com.example.topyouth.R;
+import com.example.topyouth.login.LoginActivity;
 
 public class MediaStuff {
     private static final String TAG = "MediaStuff";
@@ -31,7 +38,7 @@ public class MediaStuff {
     /**
      * Check permission request if SDK > 23
      */
-    public static void checkPermissions(Activity activity) {
+    public void checkPermissions(Activity activity) {
         if (Build.VERSION.SDK_INT >= 23) {
             int REQUEST_CAMERA = 1;
             int REQUEST_GALLERY = 2;
@@ -71,21 +78,53 @@ public class MediaStuff {
      * Camera or Gallery
      */
     public void dialogChoice() {
-        final CharSequence[] options = {"CAMERA", "GALLERY", "CANCEL"};
-        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Add Image");
-        builder.setIcon(R.mipmap.top_youth_logo_icone);
-        builder.setItems(options, (dialog, which) -> {
-            if (options[which].equals("CAMERA")) {
-                takePicture();
-            } else if (options[which].equals("GALLERY")) {
-                selectPicture();
-            } else if (options[which].equals("CANCEL")) {
-                dialog.dismiss();
-            }
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
+        wlp.gravity = Gravity.CENTER;
+        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        alertDialog.getWindow().setAttributes(wlp);
+        alertDialog.getWindow().setBackgroundDrawable(activity.getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
 
+        View layoutView = activity.getLayoutInflater().inflate(R.layout.media_choice_layout, null);
+        ImageView cameraButton = layoutView.findViewById(R.id.camera_item);
+        ImageView galleryButton = layoutView.findViewById(R.id.gallery_item);
+        Button cancelButton = layoutView.findViewById(R.id.cancel_item);
+        alertDialog.setView(layoutView);
+
+        cameraButton.setOnClickListener(v -> {
+            takePicture();
+            alertDialog.dismiss();
         });
-        builder.show();
+        galleryButton.setOnClickListener(v -> {
+            selectPicture();
+            alertDialog.dismiss();
+        });
+
+
+        cancelButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+
+        alertDialog.show();
+//        final CharSequence[] options = {"Camera", "Gallery", "Cancel"};
+//        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+//        builder.setTitle("Add media");
+//        builder.setIcon(R.mipmap.top_youth_logo_icone);
+//        builder.setItems(options, (dialog, which) -> {
+//            if (options[which].equals("CAMERA")) {
+//                takePicture();
+//            } else if (options[which].equals("GALLERY")) {
+//                selectPicture();
+//            } else if (options[which].equals("CANCEL")) {
+//                dialog.dismiss();
+//            }
+//
+//        });
+//        builder.show();
     }
 
 }
