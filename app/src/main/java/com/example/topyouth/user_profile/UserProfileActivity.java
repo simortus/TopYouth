@@ -15,8 +15,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -99,7 +97,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private MediaStuff mediaStuff;
     private Executor executor = Executors.newCachedThreadPool();
     private Uri mUri;
-    private List<String> bitmaps = new ArrayList<>();
+    private List<PostModel> postModelList = new ArrayList<>();
 
 
     @Override
@@ -137,7 +135,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         mNavigationView = findViewById(R.id.nav_view);
         toolbar = findViewById(R.id.toolBar);
 
-        adapter = new GridImageAdapter(context, R.layout.layout_grid_imageview, bitmaps);
+        adapter = new GridImageAdapter(context, R.layout.layout_grid_imageview, postModelList);
         gridView.setAdapter(adapter);
 
         //bottomNav handlers
@@ -168,10 +166,45 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    // handles the gridView onItemClickListener events
     private void gridviewClickListener() {
-        gridView.setOnItemClickListener((parent, view, position, id) -> {//<-clicklistener on position in gridView-->
-            Toast.makeText(context, "Item clicked: " + bitmaps.get(position) + id, Toast.LENGTH_SHORT).show();
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            Toast.makeText(context, "Item clicked url: " + postModelList.get(position).getPostDetails() + id, Toast.LENGTH_SHORT).show();
+            PostModel currentPostModel = postModelList.get(position);
+            displayPostInDialog(currentPostModel);
         });
+    }
+
+    private void displayPostInDialog(@NonNull PostModel currentPostModel) {
+
+        // TODO: 8/3/21 finish this one here
+//        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+//        AlertDialog alertDialog = alertDialogBuilder.create();
+//        alertDialog.setCanceledOnTouchOutside(false);
+//        WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+//        wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
+//        wlp.gravity = Gravity.BOTTOM;
+//        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+//        alertDialog.getWindow().setAttributes(wlp);
+//        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
+//
+//        View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
+//        Button confirmButton = layoutView.findViewById(R.id.confirmButton);
+//        Button cancelButton = layoutView.findViewById(R.id.cancelButton);
+//        alertDialog.setView(layoutView);
+//
+//        confirmButton.setOnClickListener(v -> {
+//            authSingleton.signOut();
+//            alertDialog.dismiss();
+//            new Traveler().gotoWithFlags(this, LoginActivity.class);
+//            finish();
+//        });
+//        cancelButton.setOnClickListener(v -> {
+//            alertDialog.dismiss();
+//        });
+//
+//
+//        alertDialog.show();
     }
 
 
@@ -192,7 +225,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             PostModel postModel = ds.getValue(PostModel.class);
                             Log.d(TAG, "setupGridView onDataChange: " + postModel.getPostDetails());
-                            bitmaps.add(postModel.getImageUrl());
+                            postModelList.add(postModel);
 
                         }
                         adapter.notifyDataSetChanged();
@@ -204,17 +237,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
                     }
                 });
-
-
-//                PostModel p_Profile = new PostModel();
-//                final List<PostModel> postList = new ArrayList<>();//<-setup grid view -->
-//                postList.add(p_Profile);
-//                int gridWidth = getResources().getDisplayMetrics().widthPixels;
-//                int imageWidth = gridWidth / NUM_GRID_COLUMNS;
-//                gridView.setColumnWidth(imageWidth);
-//
-//                gridView.setAdapter(adapter);
-//                adapter.notifyDataSetChanged();
 
             } catch (Exception e) {
                 Log.d(TAG, "setupGridView: error; " + e.getMessage());//<-catch exception to prevent app crush -->

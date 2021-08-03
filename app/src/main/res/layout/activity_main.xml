@@ -29,27 +29,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@android:dimen/app_icon_size">
-<!--            android:layout_marginBottom="@android:dimen/app_icon_size"-->
 
             <include layout="@layout/layout_center_view_pager" />
 
             <include layout="@layout/not_approved" />
 
         </RelativeLayout>
-
-<!--        <RelativeLayout-->
-
-<!--            android:id="@+id/bottomSectionMainActivity"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent">-->
-
-<!--            <include-->
-<!--                layout="@layout/add_item_post_layout"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_alignParentBottom="true" />-->
-
-<!--        </RelativeLayout>-->
 
     </FrameLayout>
 

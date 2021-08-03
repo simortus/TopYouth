@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,88 +16,92 @@
         app:cardElevation="@dimen/cardview_default_elevation">
 
         <RelativeLayout
-            android:background="@android:color/transparent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
 
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/post_user_image"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_margin="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
                 android:src="@drawable/user" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/post_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:maxEms="20"
+                android:layout_alignBaseline="@id/post_user_image"
                 android:layout_alignBottom="@id/post_user_image"
                 android:layout_toEndOf="@id/post_user_image"
                 android:fontFamily="@font/arimo"
+                android:maxEms="20"
+                android:maxLines="1"
+                android:padding="3dp"
                 android:text="@string/topUser"
                 android:textColor="@color/blue_darkish"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
 
-            <ImageButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/post_setting"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="100dp"
-                android:elevation="10dp"
-                android:layout_height="30dp"
+                android:layout_width="150dp"
+                android:layout_height="@android:dimen/app_icon_size"
                 android:layout_alignParentEnd="true"
-                android:layout_margin="3dp"
                 android:contentDescription="@string/settings"
-                android:src="@drawable/setting_sign"
-                android:onClick="onClick" />
+                android:elevation="10dp"
+                android:onClick="onClick"
+                android:paddingLeft="120dp"
+                android:src="@drawable/vertical_more_icone" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/post_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_user_image"
                 android:layout_margin="3dp"
-                android:fontFamily="@font/roboto"
-                android:padding="3dp"
                 android:contentDescription="@string/post_title"
+                android:fontFamily="@font/roboto"
+                android:maxEms="80"
+                android:padding="3dp"
                 android:text="@string/post_details"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/black" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/post_image"
                 android:layout_width="match_parent"
                 android:layout_height="@android:dimen/thumbnail_height"
-                android:layout_margin="@dimen/cardview_default_radius"
                 android:layout_below="@id/post_details"
-                android:src="@drawable/image_icone_outlined" />
+                android:layout_margin="@dimen/cardview_default_radius"
+                android:background="@drawable/image_icone_outlined" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/post_likes_number"
                 android:layout_width="wrap_content"
-                android:layout_alignStart="@id/like_button"
                 android:layout_height="wrap_content"
-                android:textAllCaps="false"
-                android:fontFamily="@font/arimo"
                 android:layout_below="@id/post_image"
+                android:layout_alignStart="@id/like_button"
                 android:layout_marginStart="@android:dimen/app_icon_size"
-                android:textColor="@color/black"
-                 />
+                android:fontFamily="@font/arimo"
+                android:textAllCaps="false"
+                android:textColor="@color/black" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/post_comments_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_image"
-                android:fontFamily="@font/arimo"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="30dp"
+                android:fontFamily="@font/arimo"
                 android:textColor="@color/black" />
 
-            <ImageButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/comment_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="150dp"
@@ -104,14 +109,14 @@
                 android:layout_below="@id/post_likes_number"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="2dp"
-                android:elevation="10dp"
                 android:contentDescription="@string/comment"
-                android:fontFamily="@font/arimo"
+                android:elevation="10dp"
                 android:focusable="true"
+                android:fontFamily="@font/arimo"
                 android:onClick="onClick"
                 android:src="@drawable/comment_icone1" />
 
-            <ImageButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/like_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="150dp"
@@ -124,23 +129,23 @@
                 android:onClick="onClick"
                 android:src="@drawable/like_sign" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/like_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/like_button"
-                android:fontFamily="@font/arimo"
                 android:layout_alignStart="@id/like_button"
                 android:layout_marginStart="60dp"
+                android:fontFamily="@font/arimo"
                 android:text="@string/like" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/comment_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="45dp"
                 android:layout_below="@id/comment_button"
                 android:layout_alignStart="@id/comment_button"
+                android:layout_marginStart="45dp"
                 android:text="@string/comment" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

@@ -11,9 +11,11 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -41,13 +43,14 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     //view
     private RelativeLayout notApprovedLayout, userLayout;
     private BottomNavigationView bottomNavigationView;
     private RecyclerViewAdapter viewAdapter;
     private RecyclerView recyclerViewer;
+    private FrameLayout frameLayout;
 
 
     //firebase
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void findWidgets() {
         notApprovedLayout = findViewById(R.id.not_approved_layout);
+        frameLayout = findViewById(R.id.container);
         userLayout = findViewById(R.id.userLayout);
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
         bottomNavigationHandler = new BottomNavigationHandler(this, bottomNavigationView);
@@ -90,6 +94,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerViewer = findViewById(R.id.recyclerViewer);
         viewAdapter = new RecyclerViewAdapter(this, postList, postOwnerList);
         recyclerViewer.setAdapter(viewAdapter);
+
+        recyclerViewer.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
 
 
     }
@@ -105,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         database = dbSingelton.getDbInstance();
         bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
         MenuItem homeItem = bottomNavigationView.getMenu().getItem(0);
-        homeItem.getIcon().setTint(getResources().getColor(R.color.yellowish));
         homeItem.setChecked(true);
 
         Runnable one = this::readPosts;
@@ -121,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerViewer.setLayoutManager(mLayoutManager);
     }
 
-    private final void postOwner(final String user_id) {
+    private void postOwner(final String user_id) {
         final DatabaseReference userRef = database.getReference("users");
         Query query = userRef.child(user_id);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -133,8 +143,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     TopUser user = dataSnapshot.getValue(TopUser.class);
                     Log.d(TAG, "onDataChange: PostOwnerID: " + user_id);
                     postOwnerList.add(user);
-//                    viewAdapter.notifyDataSetChanged();
-
                 }
                 viewAdapter.notifyDataSetChanged();
             }
@@ -178,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, "onCancelled: Error: " + databaseError);
-
             }
         });
     }
@@ -189,29 +196,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         finish();
     }
 
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public void onClick(View view) {
-//        switch (view.getId()) {
-//        }
-    }
-
-
-    private void signOut() {
-        mAuth.signOut();
-        Toast.makeText(mContext, "Logged out", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, LoginActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-        finish();
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.d(TAG, "onItemSelected: Item clicked: " + adapterView.getSelectedView().getId());
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-    }
 }

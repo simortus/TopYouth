@@ -14,18 +14,19 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
+import com.example.topyouth.molde.PostModel;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.List;
 
-public class GridImageAdapter extends ArrayAdapter {
+public class GridImageAdapter extends ArrayAdapter<PostModel> {
     private static final String TAG = "GridImageAdapter";
     private Context mContext;
     private LayoutInflater mInflater;
     private int layoutResource;
-    private List<String> imgURLs;
+    private List<PostModel> imgURLs;
 
-    public GridImageAdapter(Context context, int layoutResource, List<String> imgURLs) {
+    public GridImageAdapter(Context context, int layoutResource, List<PostModel> imgURLs) {
         super(context, layoutResource, imgURLs);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.mContext = context;
@@ -51,7 +52,7 @@ public class GridImageAdapter extends ArrayAdapter {
             holder.mProgressBar.setVisibility(View.VISIBLE);
         }
         holder.mProgressBar.setVisibility(View.VISIBLE);
-        String photoUrl = imgURLs.get(position);
+        String photoUrl = imgURLs.get(position).getImageUrl();
         Glide.with(convertView).load(photoUrl).centerCrop().into(holder.image);
         holder.mProgressBar.setVisibility(View.INVISIBLE);
         return convertView;

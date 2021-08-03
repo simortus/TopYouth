@@ -151,11 +151,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 if (dataSnapshot.hasChildren()) {
                     final String numberofLikes = String.valueOf(dataSnapshot.getChildrenCount());
                     int likeNumbers = Integer.valueOf(numberofLikes);
-                    if (likeNumbers ==1){
-                        holder.postLikeNumber.setText(numberofLikes+" like");
+                    if (likeNumbers == 1) {
+                        holder.postLikeNumber.setText(numberofLikes + " like");
                     }
-                    if (likeNumbers > 1){
-                        holder.postLikeNumber.setText(numberofLikes+" likes");
+                    if (likeNumbers > 1) {
+                        holder.postLikeNumber.setText(numberofLikes + " likes");
                     }
 
                 } else {
@@ -237,6 +237,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             postImageView = itemView.findViewById(R.id.post_image);
             likeText = itemView.findViewById(R.id.like_text);
 
+            //click listeners handlers
             likeImageButton.setOnClickListener(this);
             settingImageButton.setOnClickListener(this);
             commentImageButton.setOnClickListener(this);
@@ -270,6 +271,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         private void openCommentDisplay() {
             final View layoutView = mContext.getLayoutInflater().inflate(R.layout.comment_display_layout, null);
             final ListView listView = layoutView.findViewById(R.id.list_view);
+//            final Button doneButton = layoutView.findViewById(R.id.doneButton_dialog);
 
             final List<TopUser> commentators = new ArrayList<>();
             final List<Comments> commentsList = new ArrayList<>();
@@ -288,6 +290,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
             dialog.setNegativeButton("Done", (dialogInterface, i) -> dialogInterface.dismiss());
+
+//            doneButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    alertDialog.dismiss();
+//                }
+//            });
+
             dialog.setView(layoutView);
 
             //Data  and layout setup

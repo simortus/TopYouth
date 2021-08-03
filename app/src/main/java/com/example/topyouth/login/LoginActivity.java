@@ -1,23 +1,29 @@
 package com.example.topyouth.login;
 
+import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+
 import com.example.topyouth.R;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
 import com.example.topyouth.utility_classes.Traveler;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -43,6 +49,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //utils
     private Traveler traveler = new Traveler();
     private MessageDigest hashAlgo;
+    private AccessibilityService.SoftKeyboardController keyboardController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +110,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         forgot_pass = findViewById(R.id.textViewforgot_pass);
         login_layout = findViewById(R.id.login_layout);
 
+        register_new_user.setPaintFlags(register_new_user.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        forgot_pass.setPaintFlags(forgot_pass.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
     }
 
     @Override
@@ -131,11 +141,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final String pass = et_pass.getText().toString();
         final byte[] passEncoded = hashAlgo.digest(pass.getBytes());
         final String p = new String(passEncoded);
+        final View view = getCurrentFocus();
+//        if (view != null) {
+//            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//        }
+        traveler.hideKeyboard(getCurrentFocus(), mContext);
+        if (authSingleton.checkInternetConnection()) {
 
-        if (!email.isEmpty() && !pass.isEmpty()) {
-            authSingleton.signInWithEmailAndPassword(email, p);
-        } else
-            Toast.makeText(mContext, "Please provide the needed credentials.", Toast.LENGTH_SHORT).show();
+            if (!email.isEmpty() && !pass.isEmpty()) {
+                authSingleton.signInWithEmailAndPassword(email, p);
+            } else
+                Toast.makeText(mContext, "Please provide the needed credentials.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mContext, R.string.check_internet, Toast.LENGTH_SHORT).show();//<-Notify user to check internet-->
+
+        }
 
     }
 

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.transition.Fade;
 import android.transition.Transition;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 public class Traveler  {
     private static final String TAG = "Traveler";
@@ -43,6 +47,14 @@ public class Traveler  {
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
             fragmentManager.beginTransaction().commit();
+        }
+    }
+
+    public void hideKeyboard(View view, Context context){
+        // Check if no view has focus:
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 }
