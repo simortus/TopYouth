@@ -8,48 +8,51 @@
 
     <RelativeLayout
         android:gravity="center"
+        android:layout_margin="@dimen/cardview_default_elevation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/camera_item"
             android:clickable="true"
             android:focusable="true"
             android:layout_marginStart="?actionBarSize"
-            android:background="@drawable/round_edge_rectangle_button_recycler_view"
+            android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
             android:layout_marginEnd="?actionBarSize"
             android:elevation="5dp"
             android:src="@drawable/camera_icone"
-            android:layout_width="120dp"
+            android:layout_width="match_parent"
             android:layout_height="?actionBarSize"/>
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/gallery_item"
             android:clickable="true"
             android:focusable="true"
             android:layout_below="@id/camera_item"
-            android:layout_width="120dp"
+            android:layout_width="match_parent"
             android:elevation="5dp"
+            android:layout_marginTop="@dimen/cardview_default_elevation"
             android:layout_height="?actionBarSize"
             android:layout_marginStart="?actionBarSize"
             android:layout_marginEnd="?actionBarSize"
-            android:background="@drawable/round_edge_rectangle_button_recycler_view"
+            android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
             android:src="@drawable/image_icone_outlined" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/cancel_item"
-            android:layout_width="120dp"
+            android:layout_width="match_parent"
             android:elevation="5dp"
             android:layout_height="?actionBarSize"
             android:layout_below="@id/gallery_item"
             android:layout_marginStart="?actionBarSize"
             android:text="@string/cancel"
+            android:layout_marginTop="@dimen/cardview_default_elevation"
             android:textAllCaps="false"
-            android:textColor="@color/blue"
+            android:textColor="@color/green"
             android:fontFamily="@font/arimo"
             android:layout_marginEnd="?actionBarSize"
-            android:background="@drawable/round_edge_rectangle_button_recycler_view"
+            android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
             />
 
     </RelativeLayout>
