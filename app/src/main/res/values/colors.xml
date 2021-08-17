@@ -11,13 +11,15 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="grey">#80A5A2A2</color>
-    <color name="fade_grey">#80E3F2FD</color>
+    <color name="fade_grey">#993383B1</color>
     <color name="shadow_back">#90E2E8AB</color>
-    <color name="green">#4CAF50</color>
+    <color name="green">#31D19E</color>
     <color name="green_d">#A5D6A7</color>
-    <color name="red">#F44336</color>
+    <color name="red">#A8261C</color>
     <color name="red_light">#FA685D</color>
     <color name="yellow_fade_recy">#4AF6EFB5</color>
+    <color name="background_dark">#1A1C1F</color>
+
 
 
 </resources>

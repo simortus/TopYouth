@@ -1,17 +1,13 @@
 package com.example.topyouth.utility_classes;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,7 +39,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author mohamed-msaad
@@ -58,7 +53,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference users_ref = database.getReference("users");
     private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
-    private DBSingelton mDbSingleton = DBSingelton.getInstance();
+    private DBSingleton mDbSingleton = DBSingleton.getInstance();
 
 
     //vars

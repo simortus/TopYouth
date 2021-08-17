@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:theme="@style/Widget.AppCompat.Light.ActionBar.TabBar"
+    xmlns:context="http://schemas.android.com/tools"
+    context:context=".user_profile.UserProfileActivity"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/editText_username"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            android:textAlignment="center"
+            android:inputType="text"
+            android:hint="@string/change_user_name"
+            android:layout_marginTop="@dimen/cardview_default_elevation"
+            android:maxEms="20"
+            android:minEms="3"
+            android:background="@drawable/edit_text_background"
+            android:layout_marginStart="@android:dimen/app_icon_size"
+            android:layout_marginEnd="@android:dimen/app_icon_size"
+            android:padding="5dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:fontFamily="@font/arimo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </androidx.appcompat.widget.AppCompatEditText>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/saveButton"
+            style="@style/Widget.AppCompat.ButtonBar"
+            android:text="@string/save"
+            android:fontFamily="@font/arimo"
+            android:textAllCaps="false"
+            android:padding="3dp"
+            android:onClick="onClick"
+            android:textColor="@color/white"
+            android:layout_below="@id/editText_username"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_design_selector_round_blue"
+            android:backgroundTint="@color/green"
+            android:elevation="5dp"
+            android:layout_alignParentStart="true"
+            android:layout_width="150dp"
+            android:layout_height="@android:dimen/app_icon_size">
+
+        </androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/discardButton"
+            android:textColor="@color/white"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:text="@string/cancel"
+            android:background="@drawable/button_design_selector_round_blue"
+            android:fontFamily="@font/arimo"
+            android:onClick="onClick"
+            android:padding="3dp"
+            android:layout_alignParentEnd="true"
+            android:elevation="5dp"
+            android:layout_below="@id/editText_username"
+            android:layout_margin="10dp"
+            android:textAllCaps="false"
+            android:layout_width="150dp"
+            android:layout_height="@android:dimen/app_icon_size">
+
+        </androidx.appcompat.widget.AppCompatButton>
+    </RelativeLayout>
+
+</LinearLayout>

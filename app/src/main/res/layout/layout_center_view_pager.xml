@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey"
+    android:background="@color/background_dark"
     android:orientation="vertical">
 
     <RelativeLayout
-        android:layoutMode="clipBounds"
         android:id="@+id/userLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -17,29 +16,12 @@
             android:id="@+id/recyclerViewer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
             tools:itemCount="1"
+            android:layout_margin="5dp"
             android:elevation="4dp"
             android:padding="1px"
             tools:listitem="@layout/post_item_layout" />
 
     </RelativeLayout>
-<!--    <include-->
-<!--        layout="@layout/add_item_post_layout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="?actionBarSize">-->
-<!--    </include>-->
-
-<!--    <RelativeLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="?actionBarSize">-->
-
-<!--        <include-->
-<!--            android:layout_below="@id/userLayout"-->
-<!--            layout="@layout/add_item_post_layout"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"/>-->
-<!--    </RelativeLayout>-->
-
 
 </LinearLayout>

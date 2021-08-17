@@ -17,7 +17,7 @@
             android:id="@+id/login_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/fade_grey">
+            android:background="@color/background_dark">
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/top_youth_logo"
@@ -37,7 +37,7 @@
                 android:text="@string/memebers_login_here"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textStyle="bold" />
 
             <EditText
@@ -45,10 +45,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="50dp"
+                android:layout_marginStart="?actionBarSize"
+                android:layout_centerHorizontal="true"
+                android:layout_marginEnd="?actionBarSize"
                 android:background="@drawable/edit_text_background"
-                android:elevation="4dp"
+                android:elevation="5dp"
                 android:hint="@string/type_in_your_email"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
@@ -64,14 +65,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/email_field"
-                android:layout_marginStart="50dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginEnd="50dp"
+                android:layout_marginStart="?actionBarSize"
+                android:layout_marginEnd="?actionBarSize"
+                android:layout_centerHorizontal="true"
                 android:background="@drawable/edit_text_background"
                 android:hint="@string/type_in_your_password"
                 android:inputType="textPassword"
                 android:maxEms="30"
                 android:maxLines="1"
+                android:elevation="5dp"
                 android:minEms="8"
                 android:padding="5dp"
                 android:textAlignment="center">
@@ -80,14 +83,15 @@
 
             <Button
                 android:id="@+id/button_login"
-                android:layout_width="150dp"
-                android:layout_height="30dp"
+                android:layout_width="@android:dimen/thumbnail_width"
+                android:layout_height="@android:dimen/app_icon_size"
                 android:layout_below="@id/pass_field"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="10dp"
                 android:layout_marginEnd="100dp"
                 android:background="@drawable/button_design_selector_round_blue"
                 android:elevation="5dp"
+                android:hint="@string/login"
                 android:fontFamily="@font/arimo"
                 android:textColor="@color/white"
                 android:onClick="onClick"
@@ -100,29 +104,30 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/button_login"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="?actionBarSize"
+                android:layout_marginTop="@android:dimen/app_icon_size"
                 android:layout_marginBottom="5dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/roboto"
                 android:onClick="onClick"
                 android:text="@string/forgotten_password_click_here"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/green"
                 android:textStyle="italic" />
 
             <TextView
                 android:id="@+id/textView_register_new_user"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textViewforgot_pass"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="?actionBarSize"
                 android:clickable="true"
                 android:focusable="true"
+                android:textAlignment="center"
                 android:fontFamily="@font/roboto"
                 android:onClick="onClick"
                 android:text="@string/have_no_account"
-                android:textColor="@color/black"
+                android:textColor="@color/green"
                 android:textStyle="italic" />
 
         </RelativeLayout>

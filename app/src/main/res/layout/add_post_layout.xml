@@ -12,9 +12,9 @@
         <EditText
             android:id="@+id/postDetailsEditText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@android:dimen/app_icon_size"
             android:inputType="textMultiLine"
-            android:layout_margin="5dp"
+            android:layout_margin="10sp"
             android:background="@drawable/edit_text_background"
             android:hint="@string/your_thoughts"
             android:padding="5dp"/>
@@ -40,11 +40,11 @@
             android:layout_below="@id/postDetailsEditText"
             android:src="@drawable/image_icone_outlined"
             android:elevation="5dp"
-            android:background="@drawable/round_edge_rectangle_button_recycler_view"
+            android:background="@drawable/edit_text_background"
             android:clickable="true"
             android:focusable="true"
             android:onClick="onClick"
-            android:layout_marginTop="?actionBarSize"
+            android:layout_marginTop="@android:dimen/app_icon_size"
             android:layout_centerHorizontal="true">
 
         </ImageView>
@@ -53,7 +53,7 @@
             android:id="@+id/uploadButton"
             android:layout_below="@id/postImageView"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="?actionBarSize"
+            android:layout_marginTop="@android:dimen/app_icon_size"
             android:onClick="onClick"
             android:src="@drawable/upload"
             android:elevation="5dp"
@@ -65,8 +65,8 @@
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_marginLeft="?actionBarSize"
             android:layout_marginRight="?actionBarSize"
-            android:layout_width="150dp"
-            android:layout_height="30dp">
+            android:layout_width="@android:dimen/thumbnail_width"
+            android:layout_height="@android:dimen/app_icon_size">
         </Button>
 
     </RelativeLayout>

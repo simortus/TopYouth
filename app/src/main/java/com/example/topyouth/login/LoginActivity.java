@@ -2,6 +2,7 @@ package com.example.topyouth.login;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
@@ -55,6 +56,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+        mContext = getApplicationContext();
+        fragmentManager = getSupportFragmentManager();
+        try {
+            hashAlgo = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            Log.d(TAG, "onCreate: Hash-Algorithm exception: " + e.getLocalizedMessage());
+        }
 
         connectFirebase();
         inintWidgets();
@@ -70,7 +78,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count < 8) {
                     button_login.setEnabled(false);
-                } else button_login.setEnabled(true);
+                }
+                else button_login.setEnabled(true);
             }
 
             @Override
@@ -83,16 +92,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void connectFirebase() {
-        mContext = getApplicationContext();
-        fragmentManager = getSupportFragmentManager();
-        try {
-            hashAlgo = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            Log.d(TAG, "onCreate: Hash-Algorithm exception: " + e.getLocalizedMessage());
-        }
         authSingleton = FirebaseAuthSingleton.getInst(this);
-        mAuth = authSingleton.mAuth();
-        mUser = authSingleton.getCurrentUser();
+        if (authSingleton.checkInternetConnection()){
+            mAuth = authSingleton.mAuth();
+            mUser = authSingleton.getCurrentUser();
+        }
+        else {
+            Toast.makeText(mContext,"Please check your internet connection",Toast.LENGTH_SHORT).show();
+        }
+
+
 
     }
 
@@ -123,13 +132,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.textViewforgot_pass:
-                // TODO: 6/3/21 open register fragmenet
-                Toast.makeText(mContext, "textViewforgot_pass is clicked", Toast.LENGTH_SHORT).show();
+                traveler.goFragment(fragmentManager, new ForgotPasswordFragment(), R.id.container);
+                login_layout.setVisibility(View.GONE);
                 break;
 
             case R.id.textView_register_new_user:
                 // TODO: 6/6/21 open register fragment
-                Toast.makeText(mContext, "textView_register_new_user is clicked", Toast.LENGTH_SHORT).show();
                 traveler.goFragment(fragmentManager, new RegisterUser(), R.id.container);
                 login_layout.setVisibility(View.GONE);
                 break;
@@ -142,10 +150,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final byte[] passEncoded = hashAlgo.digest(pass.getBytes());
         final String p = new String(passEncoded);
         final View view = getCurrentFocus();
-//        if (view != null) {
-//            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-//        }
         traveler.hideKeyboard(getCurrentFocus(), mContext);
         if (authSingleton.checkInternetConnection()) {
 
@@ -154,7 +158,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else
                 Toast.makeText(mContext, "Please provide the needed credentials.", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(mContext, R.string.check_internet, Toast.LENGTH_SHORT).show();//<-Notify user to check internet-->
+            Toast toast = Toast.makeText(mContext,null,Toast.LENGTH_SHORT);
+            View view1 = getLayoutInflater().inflate(R.layout.offline_layout,null);
+            view1.setX(0);
+            view1.setY(0);
+            toast.setView(view1);
+            toast.show();
+//            Toast.makeText(mContext, R.string.check_internet, Toast.LENGTH_SHORT).show();//<-Notify user to check internet-->
 
         }
 

@@ -8,22 +8,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/gridImageView"
-            android:layout_width="@android:dimen/notification_large_icon_width"
-            android:layout_height="@android:dimen/notification_large_icon_height"
-            android:layout_margin="5dp"
-            android:background="@drawable/round_edge_rectangle_button_recycler_view"
-            android:elevation="4dp"
-            android:scaleType="centerCrop"/>
+            <ImageView
+                android:id="@+id/gridImageView"
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_margin="5dp"
+                android:elevation="4dp"
+                android:scaleType="centerCrop" />
 
-        <ProgressBar
-            android:id="@+id/grid_image_progress_bar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_centerInParent="true"
-            android:visibility="visible" />
+            <ProgressBar
+                android:layout_gravity="center"
+                android:id="@+id/grid_image_progress_bar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:visibility="visible" />
+        </androidx.cardview.widget.CardView>
+
+
     </RelativeLayout>
 
 </LinearLayout>

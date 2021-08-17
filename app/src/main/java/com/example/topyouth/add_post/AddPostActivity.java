@@ -4,25 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -30,18 +24,13 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
-import com.example.topyouth.molde.Comments;
-import com.example.topyouth.molde.Likes;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
-import com.example.topyouth.utility_classes.DBSingelton;
+import com.example.topyouth.utility_classes.DBSingleton;
 import com.example.topyouth.utility_classes.MediaStuff;
 import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,13 +42,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public class AddPostActivity extends AppCompatActivity implements View.OnClickListener {
@@ -85,7 +69,7 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseUser mUser;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseFirestore mFirestore;
-    private DBSingelton dbSingelton;
+    private DBSingleton dbSingleton;
     private FirebaseDatabase database;
     private FirebaseStorage storage;
 
@@ -310,11 +294,11 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
         authSingleton = FirebaseAuthSingleton.getInst(this);
         mAuth = authSingleton.mAuth();
         mUser = authSingleton.getCurrentUser();
-        dbSingelton = DBSingelton.getInstance();
-        database = dbSingelton.getDbInstance();
-        mFirestore = dbSingelton.getmFirestore();
-        storage = dbSingelton.getStorage();
-        postsRef = dbSingelton.getPostsRef();
+        dbSingleton = DBSingleton.getInstance();
+        database = dbSingleton.getDbInstance();
+        mFirestore = dbSingleton.getmFirestore();
+        storage = dbSingleton.getStorage();
+        postsRef = dbSingleton.getPostsRef();
         topUser();
         mAuthStateListener = firebaseAuth -> {
             mAuth.addAuthStateListener(mAuthStateListener);

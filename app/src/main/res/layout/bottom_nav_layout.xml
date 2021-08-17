@@ -9,11 +9,12 @@
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
-            android:layout_height="@android:dimen/app_icon_size"
+            android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.ActionBar.Surface"
             app:menu="@menu/menu_items"
-            android:elevation="5dp"
-            android:background="@color/blue_fade"
+            android:backgroundTintMode="screen"
+            android:saveEnabled="true"
+            android:background="@color/white"
             android:id="@+id/bottomNavigationBar">
 
         </com.google.android.material.bottomnavigation.BottomNavigationView>

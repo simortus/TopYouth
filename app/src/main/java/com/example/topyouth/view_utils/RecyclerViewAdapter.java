@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,7 +33,7 @@ import com.example.topyouth.molde.Comments;
 import com.example.topyouth.molde.Likes;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
-import com.example.topyouth.utility_classes.DBSingelton;
+import com.example.topyouth.utility_classes.DBSingleton;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,7 +45,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -59,17 +60,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<TopUser> postOwnerList;
     private List<Likes> postLikes;
     private List<Comments> postComments;
+    private Drawable like_sign, liked_sign;
+
 
     //database
     private FirebaseUser currentUser;
     private FirebaseAuthSingleton singleton;
-    private DBSingelton dbSingelton = DBSingelton.getInstance();
-    private DatabaseReference postRef = dbSingelton.getPostsRef(),
-            userRef = dbSingelton.getUsers_ref(),
-            commentRef = dbSingelton.getCommentsRef(),
-            likeRef = dbSingelton.getLikesRef();
+    private DBSingleton dbSingleton = DBSingleton.getInstance();
+    private DatabaseReference postRef = dbSingleton.getPostsRef(),
+            userRef = dbSingleton.getUsers_ref(),
+            commentRef = dbSingleton.getCommentsRef(),
+            likeRef = dbSingleton.getLikesRef();
 
-    private FirebaseDatabase database = dbSingelton.getDbInstance();
+    private FirebaseDatabase database = dbSingleton.getDbInstance();
 
     // threads
     private ExecutorService executors = Executors.newCachedThreadPool();
@@ -86,7 +89,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_layout, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_layout, parent, false);
+        like_sign = mContext.getDrawable(R.drawable.like_sign_outlined);
+        liked_sign = mContext.getDrawable(R.drawable.liked_icone);
+
 
 
         return new CardViewHolder(view);
@@ -144,7 +150,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         holder.likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.liked_icone));
                         holder.likeText.setText(R.string.unlike);
                     } else {
-                        holder.likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.like_sign));
+                        holder.likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.like_sign_outlined));
                         holder.likeText.setText(R.string.like);
                     }
                 }
@@ -425,7 +431,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             });
                         } else {
                             likeRef.child(postID).child(user_id).removeValue().addOnSuccessListener(aVoid -> {
-                                likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.like_sign));
+                                likeImageButton.setImageDrawable(mContext.getDrawable(R.drawable.like_sign_outlined));
                                 likeText.setText(R.string.like);
 
                                 Log.d(TAG, "onSuccess: like removed successfully");

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="false"
-    tools:showDividers="beginning|middle"
+    tools:showDividers="middle"
     tools:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
 
     <group

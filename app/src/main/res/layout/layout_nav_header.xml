@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_header_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
     android:orientation="vertical"
-    android:background="@drawable/round_edge_rectangle_button_recycler_view"
-    tools:context=".user_profile.UserProfileActivity"
-    android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
+    android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+    tools:context=".user_profile.UserProfileActivity">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:src="@mipmap/top_youth_logo_icone"
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="30dp"
-            android:layout_height="30dp">
+            android:layout_height="30dp"
+            android:src="@mipmap/top_youth_logo_icone">
 
-        </com.mikhaellopez.circularimageview.CircularImageView>
+        </androidx.appcompat.widget.AppCompatImageView>
 
         <TextView
             android:id="@+id/textView_emailDisplay_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:padding="5dp"
             android:fontFamily="@font/rosarivo"
+            android:padding="5dp"
             android:text="@string/email"
+            android:textAlignment="center"
             android:textColor="@color/blue_darkish" />
 
     </RelativeLayout>

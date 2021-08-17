@@ -49,14 +49,14 @@
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/post_setting"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="150dp"
+                android:layout_width="@android:dimen/app_icon_size"
                 android:layout_height="@android:dimen/app_icon_size"
                 android:layout_alignParentEnd="true"
+                android:src="@drawable/vertical_more_icone"
                 android:contentDescription="@string/settings"
                 android:elevation="10dp"
                 android:onClick="onClick"
-                android:paddingLeft="120dp"
-                android:src="@drawable/vertical_more_icone" />
+                />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/post_details"
@@ -85,9 +85,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_image"
-                android:layout_alignStart="@id/like_button"
-                android:layout_marginStart="@android:dimen/app_icon_size"
                 android:fontFamily="@font/arimo"
+                android:layout_marginStart="@android:dimen/app_icon_size"
                 android:textAllCaps="false"
                 android:textColor="@color/black" />
 
@@ -97,37 +96,37 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/post_image"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="30dp"
+                android:layout_marginEnd="@android:dimen/app_icon_size"
                 android:fontFamily="@font/arimo"
                 android:textColor="@color/black" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/comment_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="150dp"
+                android:layout_width="@android:dimen/app_icon_size"
                 android:layout_height="@android:dimen/app_icon_size"
                 android:layout_below="@id/post_likes_number"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="2dp"
+                android:layout_marginEnd="@android:dimen/app_icon_size"
                 android:contentDescription="@string/comment"
                 android:elevation="10dp"
                 android:focusable="true"
                 android:fontFamily="@font/arimo"
                 android:onClick="onClick"
-                android:src="@drawable/comment_icone1" />
+                android:src="@drawable/comment_icone_outlined" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/like_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="150dp"
+                android:layout_width="@android:dimen/app_icon_size"
                 android:layout_height="@android:dimen/app_icon_size"
                 android:layout_below="@id/post_likes_number"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="@android:dimen/app_icon_size"
                 android:elevation="10dp"
                 android:focusable="true"
                 android:fontFamily="@font/arimo"
                 android:onClick="onClick"
-                android:src="@drawable/like_sign" />
+                android:src="@drawable/like_sign_outlined" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/like_text"
@@ -135,9 +134,10 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/like_button"
                 android:layout_alignStart="@id/like_button"
-                android:layout_marginStart="60dp"
+                android:paddingStart="5dp"
                 android:fontFamily="@font/arimo"
-                android:text="@string/like" />
+                android:text="@string/like"
+                tools:ignore="RtlSymmetry" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/comment_text"
@@ -145,7 +145,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/comment_button"
                 android:layout_alignStart="@id/comment_button"
-                android:layout_marginStart="45dp"
                 android:text="@string/comment" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

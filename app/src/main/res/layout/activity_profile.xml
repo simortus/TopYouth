@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".user_profile.UserProfileActivity"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    tools:context=".user_profile.UserProfileActivity">
+    android:fitsSystemWindows="false">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,6 +29,17 @@
             android:layout_weight="4">
 
             <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/approve_image_sign"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_toEndOf="@id/username"
+                android:layout_alignBottom="@id/username"
+                android:src="@drawable/check_icone"
+                android:visibility="visible">
+
+            </com.mikhaellopez.circularimageview.CircularImageView>
+
+            <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/profilePic"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
@@ -38,32 +50,13 @@
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@android:dimen/app_icon_size"
+                android:layout_height="@android:dimen/thumbnail_height"
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 app:buttonGravity="center_vertical"
-                app:collapseIcon="@drawable/comment_icone1"
-                app:titleTextColor="@color/blue_darkish" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/saveButton"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="150dp"
-                android:layout_height="30dp"
-                android:layout_below="@id/user_status"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="5dp"
-                android:background="@drawable/button_design_selector_round_blue"
-                android:fontFamily="@font/arimo"
-                android:onClick="onClick"
-                android:text="@string/apply_changes"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="10sp"
-                android:visibility="invisible">
-
-            </androidx.appcompat.widget.AppCompatButton>
+                app:collapseIcon="@drawable/comment_icone"
+                 />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/username"
@@ -72,23 +65,12 @@
                 android:layout_below="@id/profilePic"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
                 android:fontFamily="@font/roboto"
                 android:text="@string/topUser"
+                android:textColor="@color/white"
                 android:textStyle="bold" />
 
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/user_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/profilePic"
-                android:layout_alignBaseline="@id/username"
-                android:layout_toEndOf="@id/username"
-                android:fontFamily="@font/rosarivo"
-                android:padding="5dp"
-                android:text="@string/status"
-                android:textSize="8sp"
-                android:textStyle="italic" />
 
         </RelativeLayout>
 
@@ -96,16 +78,17 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="6"
-            android:background="@drawable/white_rectangle_white_backg_sharpe_edge">
+            android:layout_weight="6">
 
             <GridView
                 android:id="@+id/gridView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:elevation="4dp"
+                android:fadingEdge="horizontal"
                 android:gravity="center"
                 android:numColumns="3"
+                tools:listfooter="@null"
                 tools:listitem="@layout/layout_grid_imageview">
 
             </GridView>
@@ -115,20 +98,21 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="start"
         android:layout_marginTop="?actionBarSize"
-        android:background="@drawable/round_edge_rectangle_button_recycler_view"
+        android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
         android:elevation="10dp"
         android:fadingEdge="horizontal|vertical"
         android:fontFamily="@font/arimo"
         android:foregroundGravity="center"
         android:onClick="onClick"
         android:requiresFadingEdge="horizontal"
+        android:fadeScrollbars="true"
         app:headerLayout="@layout/layout_nav_header"
         app:itemHorizontalPadding="5dp"
-        app:itemTextColor="@color/blue_dark"
+        app:itemTextColor="@color/green"
         app:menu="@menu/nav_bar_menu"
         tools:context=".user_profile.User_Profile">
 

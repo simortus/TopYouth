@@ -1,20 +1,15 @@
 package com.example.topyouth.utility_classes;
 
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
-public class DBSingelton {
-
+public class DBSingleton {
     private static final String TAG = "DbSingleton";
 
-    private  final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
     private final FirebaseFirestore mFirestore  = FirebaseFirestore.getInstance();
 
     public FirebaseFirestore getmFirestore() {
@@ -32,11 +27,15 @@ public class DBSingelton {
             likesRef = mDatabase.getReference("likes");
 
 
-    private DBSingelton() {
-    }
+    private DBSingleton() {}
 
-    public static DBSingelton getInstance() {
-        return new DBSingelton();
+    public static DBSingleton getInstance() {
+        // TODO: 8/13/21  add activity as parameter of the method. check if activity is within the list of the app activities
+        //  then return singelton else return null
+
+//       todo>>>  @NonNull Activity activity
+//        if (activity.getClass().getName())
+        return new DBSingleton();
     }
 
     public FirebaseDatabase getDbInstance() {

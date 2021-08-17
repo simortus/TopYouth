@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,12 +34,14 @@ import com.example.topyouth.R;
 import com.example.topyouth.login.LoginActivity;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
-import com.example.topyouth.utility_classes.DBSingelton;
+import com.example.topyouth.utility_classes.DBSingleton;
 import com.example.topyouth.utility_classes.MediaStuff;
 import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
 import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
 import com.example.topyouth.view_utils.GridImageAdapter;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,9 +71,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     //view
     private BottomNavigationView bottomNavigationView;
-    private CircularImageView profileImage;
-    private TextView status, username, emailHeader;
-    private Button saveButton;
+    private CircularImageView profileImage, approved_sign;
+    private TextView username, emailHeader;
     private Toolbar toolbar;
     private View nav_header_view;
     private NavigationView mNavigationView;
@@ -90,7 +92,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private FirebaseUser mUser;
     private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
     private FirebaseDatabase database;
-    private DBSingelton dbSingelton;
+    private DBSingleton dbSingleton;
     private FirebaseStorage storage;
 
     //vars
@@ -98,6 +100,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private Executor executor = Executors.newCachedThreadPool();
     private Uri mUri;
     private List<PostModel> postModelList = new ArrayList<>();
+    private boolean updateImage, updateName;
 
 
     @Override
@@ -116,9 +119,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         authSingleton = FirebaseAuthSingleton.getInst(this);
         auth = authSingleton.mAuth();
         mUser = authSingleton.getCurrentUser();
-        dbSingelton = DBSingelton.getInstance();
-        database = dbSingelton.getDbInstance();
-        storage = dbSingelton.getStorage();
+        dbSingleton = DBSingleton.getInstance();
+        database = dbSingleton.getDbInstance();
+        storage = dbSingleton.getStorage();
 
     }
 
@@ -126,10 +129,9 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private void widgets() {
         //findView by ID
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
-        status = findViewById(R.id.user_status);
         profileImage = findViewById(R.id.profilePic);
+        approved_sign = findViewById(R.id.approve_image_sign);
         username = findViewById(R.id.username);
-        saveButton = findViewById(R.id.saveButton);
         gridView = findViewById(R.id.gridView);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mNavigationView = findViewById(R.id.nav_view);
@@ -150,7 +152,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         emailHeader = nav_header_view.findViewById(R.id.textView_emailDisplay_header);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.open, R.string.close);
         DrawerArrowDrawable arrowDrawable = new DrawerArrowDrawable(context);
-        arrowDrawable.setColor(getResources().getColor(R.color.blue_darkish));
+        arrowDrawable.setColor(getResources().getColor(R.color.green));
         arrowDrawable.setSpinEnabled(true);
         arrowDrawable.mutate();
         toggle.setDrawerArrowDrawable(arrowDrawable);
@@ -159,7 +161,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
         mNavigationView.setOnClickListener(this);
         profileImage.setOnClickListener(this);
-        saveButton.setOnClickListener(this);
         navigationViewClickListener();
 
         gridviewClickListener();
@@ -215,7 +216,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         Runnable gridViewRunnable = () -> {
             try {
                 final String user_id = mUser.getUid();
-                final DatabaseReference thisUserPosts = dbSingelton.getPostsRef();
+                final DatabaseReference thisUserPosts = dbSingleton.getPostsRef();
 
                 final Query postsQuery = thisUserPosts.child(user_id);
                 postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -263,7 +264,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private void setUserInfo() {
         final DatabaseReference userRef = database.getReference("users");
         final String user_id = mUser.getUid();
-        Runnable runnable1 = () -> setStatus(status);
+        Runnable runnable1 = this::setStatus;
         Runnable runnable2 = () -> {
             Query query = userRef.child(user_id);
             query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -300,8 +301,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    @SuppressLint("SetTextI18n")
-    private void setStatus(TextView textView) {
+    private void setStatus() {
         final String user_id = mUser.getUid();
         DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
         not_approved_users.addSnapshotListener((value, error) -> {
@@ -310,77 +310,38 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 Log.d(TAG, "onEvent: Document value_approved_status: " + value.get("status"));
                 final String status = (String) value.get("status");
                 Log.d(TAG, "isAdminApproved: status: " + status);
+                assert status != null;
                 boolean iss = status.equalsIgnoreCase("approved");
                 if (iss) {
-                    textView.setText("Approved");
-                    textView.setTextColor(getResources().getColor(R.color.green));
+                    approved_sign.setVisibility(View.VISIBLE);
                 } else {
-                    textView.setText("Not Approved");
-                    textView.setTextColor(getResources().getColor(R.color.red));
+                    approved_sign.setVisibility(View.GONE);
                 }
-            }
+            } else
+                approved_sign.setVisibility(View.GONE);
 
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        assert data != null;
-        boolean besoins = resultCode == RESULT_OK && requestCode == CAMERA_REQUEST;
-
-        try {
-
-            if (besoins) {
-                mUri = mediaStuff.getmUri();
-                Glide.with(this).load(mUri).centerCrop().into(profileImage);
-                saveButton.setEnabled(true);
-                saveButton.setVisibility(View.VISIBLE);
-            } else if (resultCode == RESULT_OK) {
-
-                mUri = data.getData();
-                Glide.with(this).load(mUri).centerCrop().into(profileImage);
-                saveButton.setEnabled(true);
-                saveButton.setVisibility(View.VISIBLE);
-
-            }
-        } catch (Exception e) {
-            Log.d(TAG, "onActivityResult: Exception: " + e.getLocalizedMessage());
-            Toast.makeText(context, "Error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.saveButton:
-                uploadNow(mUri);
-                break;
-
-            case R.id.profilePic:
-                mediaStuff.dialogChoice();
-                break;
-        }
-
-
-    }
 
     private void uploadNow(@NonNull final Uri uri) {
-        saveButton.setVisibility(View.GONE);
-        saveButton.setEnabled(false);
+//        saveButton.setVisibility(View.GONE);
+//        saveButton.setEnabled(false);
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading, please wait...");
         progressDialog.setIcon(R.mipmap.top_youth_logo_icone);
         progressDialog.setCanceledOnTouchOutside(false);
 
         final String currentUser = mUser.getUid();
-        StorageReference ref = storage.getReference("users");
+        final StorageReference ref = storage.getReference("users");
         progressDialog.show();
+
         ref.child(currentUser).putFile(uri).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 task.getResult().getStorage().getDownloadUrl().addOnCompleteListener(task1 -> {
-                    if (task1.isSuccessful()) {
+                    if (task1.isSuccessful() && task.getResult() != null) {
                         final String url = task1.getResult().toString();
+                        Glide.with(context).load(uri).centerCrop().into(profileImage);
                         updateUserImage(url);
                         progressDialog.dismiss();
                     }
@@ -399,12 +360,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             double progress = (100.0 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
             progressDialog.setMessage("uploading " + (int) progress + "%");
         });
+
     }
 
     private void updateUserImage(@NonNull final String url) {
         final String user_id = mUser.getUid();
         final DatabaseReference userRef = database.getReference("users");
-        Query query = userRef.child(user_id);
+        final Query query = userRef.child(user_id);
         query.keepSynced(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -412,7 +374,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 if (dataSnapshot.exists()) {
                     Log.d(TAG, "onDataChange: exists" + dataSnapshot.exists());
                     ((Runnable) () -> userRef.child(user_id).child("photo").setValue(url).addOnSuccessListener(aVoid ->
-                            Toast.makeText(context, "Updated successfully", Toast.LENGTH_SHORT).show())).run();
+                            Toast.makeText(context, "Profile picture updated successfully", Toast.LENGTH_SHORT).show())).run();
                 }
             }
 
@@ -435,26 +397,30 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 switch (menuItem.getItemId()) {
                     case R.id.chengeUserNameItem:
                         Log.d(TAG, "navigationViewClickListener chengeUserNameItem ");
-//                        menuItem.setChecked(true);
-//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
-//                        mDrawerLayout.closeDrawer(GravityCompat.START);
-
-//                        saveUsername();
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+                        mDrawerLayout.clearFocus();
+                        mNavigationView.getMenu().close();
+                        updateName = true;
+                        updateImage = false;
+                        changeUsername();
                         break;
 
                     case R.id.changeProfPictureItem:
                         Log.d(TAG, "navigationViewClickListener changeProfPictureItem ");
-//                        menuItem.setChecked(true);
-//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
-//                        mDrawerLayout.closeDrawer(GravityCompat.START);
-//                        optionDialog();
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+                        mDrawerLayout.clearFocus();
+                        mNavigationView.getMenu().close();
+                        updateName = false;
+                        updateImage = true;
+                        mediaStuff.dialogChoice();
                         break;
 
                     case R.id.signOutItem:
                         Log.d(TAG, "navigationViewClickListener signOutItem ");
                         menuItem.setChecked(true);
-//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
-                        mDrawerLayout.closeDrawer(mNavigationView);
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
                         mDrawerLayout.clearFocus();
                         mNavigationView.getMenu().close();
                         showSignOutDialog();
@@ -462,10 +428,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
                     case R.id.resetPassItem:
                         Log.d(TAG, "navigationViewClickListener resetPassItem ");
-//                        menuItem.setChecked(true);
-//                        new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
-//                        mDrawerLayout.closeDrawer(GravityCompat.START);
-//                        handlePasswordReset();
                         break;
 
                     case R.id.delete_accountItem:
@@ -474,7 +436,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                         new Handler().postDelayed(() -> menuItem.setChecked(false), 500);
                         mDrawerLayout.closeDrawer(GravityCompat.START);
                         showDeleteAccountDialog();
-
                         break;
                 }
                 return false;
@@ -484,22 +445,97 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void showDeleteAccountDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        AlertDialog alertDialog = alertDialogBuilder.create();
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.profilePic:
+                mediaStuff.dialogChoice();
+                break;
+        }
+
+
+    }
+
+
+    private void changeUsername() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setCanceledOnTouchOutside(false);
-        WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        final WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
         wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
         wlp.gravity = Gravity.CENTER;
         wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
         alertDialog.getWindow().setAttributes(wlp);
         alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
 
-        View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
-        TextView dialogTitle = layoutView.findViewById(R.id.dialogTitleTextView);
-        Button confirmButton = layoutView.findViewById(R.id.confirmButton);
-        Button cancelButton = layoutView.findViewById(R.id.cancelButton);
+        final View layoutView = getLayoutInflater().inflate(R.layout.change_username_dialog_layout, null);
+        final EditText editTextUsername = layoutView.findViewById(R.id.editText_username);
+        final Button confirmButton = layoutView.findViewById(R.id.saveButton);
+        final Button cancelButton = layoutView.findViewById(R.id.discardButton);
+        alertDialog.setView(layoutView);
+
+        confirmButton.setOnClickListener(v -> {
+            final String new_username = editTextUsername.getText().toString();
+            if (!new_username.isEmpty()) {
+                alertDialog.dismiss();
+                saveUserName(new_username);
+            } else {
+                editTextUsername.setError("Please enter a valid username");
+            }
+
+        });
+        cancelButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+
+        alertDialog.show();
+    }
+
+    //tested and works fine
+    private void saveUserName(@NonNull String new_username) {
+        final DatabaseReference userRef = dbSingleton.getUsers_ref();
+        final String userID = mUser.getUid();
+        final Query query = userRef.child(userID);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    userRef.child(userID).child("username").setValue(new_username).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            username.setText(new_username);
+                            Toast.makeText(context, "Username changed successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(e ->
+                            Log.d(TAG, "saveUserName onFailure: exception: " + e.getMessage()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, "saveUserName onFailure: databaseError: " + databaseError.getMessage());
+            }
+        });
+    }
+
+    private void showDeleteAccountDialog() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        final WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
+        wlp.gravity = Gravity.CENTER;
+        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        alertDialog.getWindow().setAttributes(wlp);
+        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
+
+        final View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
+        final TextView dialogTitle = layoutView.findViewById(R.id.dialogTitleTextView);
+        final Button confirmButton = layoutView.findViewById(R.id.confirmButton);
+        final Button cancelButton = layoutView.findViewById(R.id.cancelButton);
         confirmButton.setText(R.string.delete_accnt);
         dialogTitle.setText(R.string.delet_accnt_warning);
         confirmButton.getDisplay();
@@ -527,7 +563,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         // delete user from auth
 
         Runnable deleteFromUserNode = () -> {
-            final Query userQuery = dbSingelton.getUsers_ref().child(uid);
+            final Query userQuery = dbSingleton.getUsers_ref().child(uid);
             userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -546,7 +582,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
         };
         Runnable deleteFromStorage = () -> {
-            final StorageReference storageReference = dbSingelton.getStorage().getReference("users").child(uid);
+            final StorageReference storageReference = dbSingleton.getStorage().getReference("users").child(uid);
             storageReference.delete().addOnCompleteListener(task -> {
                 Log.d(TAG, "onComplete: success: " + task.isSuccessful());
 
@@ -574,19 +610,19 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void showSignOutDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setCanceledOnTouchOutside(false);
-        WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        final WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
         wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
         wlp.gravity = Gravity.CENTER;
         wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
         alertDialog.getWindow().setAttributes(wlp);
         alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
 
-        View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
-        Button confirmButton = layoutView.findViewById(R.id.confirmButton);
-        Button cancelButton = layoutView.findViewById(R.id.cancelButton);
+        final View layoutView = getLayoutInflater().inflate(R.layout.layout_signout_dialog, null);
+        final Button confirmButton = layoutView.findViewById(R.id.confirmButton);
+        final Button cancelButton = layoutView.findViewById(R.id.cancelButton);
         alertDialog.setView(layoutView);
 
         confirmButton.setOnClickListener(v -> {
@@ -598,10 +634,56 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         cancelButton.setOnClickListener(v -> {
             alertDialog.dismiss();
         });
-
-
         alertDialog.show();
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        assert data != null;
+        boolean condition = resultCode == RESULT_OK && requestCode == CAMERA_REQUEST;
+
+        try {
+            if (condition) {
+                mUri = mediaStuff.getmUri();
+                displayProfileChangeDialog(mUri);
+            } else if (resultCode == RESULT_OK) {
+                mUri = data.getData();
+                displayProfileChangeDialog(mUri);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "onActivityResult: Exception: " + e.getLocalizedMessage());
+            Toast.makeText(context, "Error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void displayProfileChangeDialog(@NonNull Uri mUri) {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        final WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+        wlp.windowAnimations = R.style.Animation_Design_BottomSheetDialog;
+        wlp.gravity = Gravity.CENTER;
+        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        alertDialog.getWindow().setAttributes(wlp);
+        alertDialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
+
+        final View layoutView = getLayoutInflater().inflate(R.layout.change_profile_picture_layout, null);
+        final CircularImageView imageProfile = layoutView.findViewById(R.id.profilePicFrame);
+        final Button confirmButton = layoutView.findViewById(R.id.saveButton);
+        final Button cancelButton = layoutView.findViewById(R.id.discardButton);
+        Glide.with(context).load(mUri).centerCrop().into(imageProfile);
+        alertDialog.setView(layoutView);
+
+        confirmButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            uploadNow(mUri);
+
+        });
+        cancelButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+        alertDialog.show();
 
     }
 }
