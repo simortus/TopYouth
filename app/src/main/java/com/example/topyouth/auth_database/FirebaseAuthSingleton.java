@@ -1,4 +1,4 @@
-package com.example.topyouth.utility_classes;
+package com.example.topyouth.auth_database;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,6 +18,7 @@ import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.login.LoginActivity;
 import com.example.topyouth.molde.TopUser;
+import com.example.topyouth.utility_classes.Traveler;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.ActionCodeSettings;
@@ -32,13 +33,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Logger;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * @author mohamed-msaad
@@ -46,45 +52,41 @@ import java.util.Map;
  **/
 public class FirebaseAuthSingleton extends FirebaseAuth {
     private static final String TAG = "AuthSingleton";
-    private Activity mContext;
+    private final Activity mContext;
     //<<----- auth, DB---->>
     private final static FirebaseAuth myAuth = FirebaseAuth.getInstance();
     private static FirebaseUser mCurrentUser;
-    private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private DatabaseReference users_ref = database.getReference("users");
-    private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
-    private DBSingleton mDbSingleton = DBSingleton.getInstance();
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private final FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
+    private final DBSingleton mDbSingleton = DBSingleton.getInstance();
 
 
     //vars
     private final Traveler mTraveler = new Traveler();
     private AlertDialog.Builder alertDialogBuilder;
     private AlertDialog alertDialog;
-
-    //<<------methods--------->>
+    //<<------------------------------Begin methods--------------------------------->>
     private FirebaseAuthSingleton(@NonNull Activity activity) {
         super(FirebaseApp.getInstance());
         this.mContext = activity;
     }
 
     //singleton of this class
+    @NonNull
     public static FirebaseAuthSingleton getInst(@NonNull Activity activity) {
-        if (myAuth != null) {
-            return new FirebaseAuthSingleton(activity);
-        } else
-            return null;
+        return new FirebaseAuthSingleton(activity);
     }
 
     public FirebaseAuth mAuth() {
         return myAuth;
     }
 
-    public boolean isUserCompliant(FirebaseUser currentUser) {
+    public boolean isUserCompliant(@NonNull FirebaseUser currentUser) {
         return currentUser != null && currentUser.isEmailVerified() && !currentUser.isAnonymous();
     }
 
     public boolean checkInternetConnection() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo() != null &&
                 connectivityManager.getActiveNetworkInfo().isAvailable() &&
                 connectivityManager.getActiveNetworkInfo().isConnected();
@@ -93,6 +95,8 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
 
     @Override
     public void signOut() {
+        database.goOffline();
+        mFirestore.disableNetwork();
         myAuth.signOut();
     }
 
@@ -254,7 +258,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
 
     @NonNull
     @Override
-    public Task<AuthResult> signInWithEmailAndPassword(@NonNull final String email, @NonNull final String pass) {
+    public Task<AuthResult> signInWithEmailAndPassword(@NonNull final String email, @NonNull final String pass){
         showDialog();
         return myAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(task1 -> {
             if (task1.isSuccessful()) {
@@ -275,23 +279,22 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
             }
         }).addOnFailureListener(e -> {
             closeDial();
+            signOut();
             Log.d(TAG, "signInWithEmailAndPassword: Auth_Error: " + e.getMessage());
             Toast.makeText(mContext, "Login error; " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            signOut();
         });
     }
 
     @NonNull
     @Override
     public Task<GetTokenResult> getAccessToken(boolean b) {
-        Task<GetTokenResult> tokenResultTask = myAuth.getAccessToken(false).addOnCompleteListener(task -> {
+        return myAuth.getAccessToken(false).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 provider(task.getResult().getSignInProvider());
             }
         }).addOnFailureListener(e -> {
             Log.d(TAG, "getAccessToken: auth_result_error: " + e.getMessage());
         });
-        return tokenResultTask;
     }
 
     @NonNull
@@ -317,7 +320,7 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
             if (task.isSuccessful()) {
                 Log.d(TAG, "sendEmailVer: task is success: " + task.isSuccessful());
                 Toast.makeText(mContext, "We sent you an email verification, check your inbox and click on th link to verify", Toast.LENGTH_SHORT).show();
-               closeDial();
+                closeDial();
                 new Handler().postDelayed(() -> {
                     mTraveler.gotoWithFlags(mContext, LoginActivity.class);
                     signOut();
@@ -476,348 +479,4 @@ public class FirebaseAuthSingleton extends FirebaseAuth {
             Log.d(TAG, "verifyPasswordResetCode: auth_error: " + e.getMessage());
         });
     }
-
-
-//    @SuppressLint("ParcelCreator")
-//    public class MyFUSER extends FirebaseUser {
-//        private static final String TAG = "MyFUSER";
-//        private Context mContext;
-//        private FirebaseAuth mAuth;
-//        private Traveler mTraveler = new Traveler();
-//        private Hashing hash = new Hashing();
-//        private FirebaseUser current_F_user;
-//
-//        public MyFUSER(Context context, FirebaseAuth auth) {
-//            mContext = context;
-//            mAuth = auth;
-//            current_F_user = auth.getCurrentUser();
-//
-//        }
-//
-//        public FirebaseUser getCurrent_F_user() {
-//            return mAuth.getCurrentUser();
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> reauthenticate(@NonNull AuthCredential authCredential) {
-//            boolean isok = current_F_user != null && current_F_user.isEmailVerified() && !current_F_user.isAnonymous();
-//            if (isok && authCredential.getProvider().equals("password")) {
-//                return current_F_user.reauthenticate(authCredential).addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        Log.d(TAG, "reauthenticate: success: " + task.isSuccessful());
-//                    }
-//                }).addOnFailureListener(e -> {
-//                    Log.d(TAG, "reauthenticate: error: " + e.getMessage());
-//                });
-//            } else
-//                return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<AuthResult> reauthenticateAndRetrieveData(@NonNull AuthCredential authCredential) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<AuthResult> startActivityForReauthenticateWithProvider(@NonNull Activity activity, @NonNull FederatedAuthProvider federatedAuthProvider) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<AuthResult> linkWithCredential(@NonNull AuthCredential authCredential) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<AuthResult> startActivityForLinkWithProvider(@NonNull Activity activity, @NonNull FederatedAuthProvider federatedAuthProvider) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<AuthResult> unlink(@NonNull String s) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> updateProfile(@NonNull UserProfileChangeRequest userProfileChangeRequest) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> updateEmail(@NonNull String s) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> updatePhoneNumber(@NonNull PhoneAuthCredential phoneAuthCredential) {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> updatePassword(@NonNull String s) {
-//
-//            boolean hasDigit = hash.hasDigits(s),
-//                    hasSpecChar = hash.hasSpecial(s),
-//                    hasNum = hash.hasDigits(s),
-//                    longEnough = hash.isLongEnough(s);
-//            Task<Void> updatePassTask = current_F_user.updatePassword(s);
-//
-//            if (longEnough && hasDigit && hasSpecChar && hasNum) {
-//
-//                return updatePassTask.addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        Toast.makeText(mContext, "Pass updated Successfully", Toast.LENGTH_SHORT).show();
-//                    }
-//                }).addOnFailureListener(e -> {
-//                    Log.d(TAG, "updatePassword: error: " + e.getMessage());
-//                    Toast.makeText(mContext, "Pass update error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                });
-//            } else
-//                return null;
-//        }
-//
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> delete() {
-//
-//            if (mAuth != null) {
-//                Task<Void> deleteUserTask = current_F_user.delete().addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        mAuth.signOut();
-//                        mTraveler.goToWithFlags(mContext, LoginActivity.class);
-//
-//                    }
-//                }).addOnFailureListener(e -> {
-//                    Log.d(TAG, "delete: error: " + e.getMessage());
-//                });
-//
-//                return deleteUserTask;
-//            } else return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> sendEmailVerification() {
-//            Context context = mContext.getApplicationContext();
-//            if (context != null && mAuth != null) {
-//                return current_F_user.sendEmailVerification().addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        Toast.makeText(context, "We sent you an email verification, check your inbox and click on th link to verify", Toast.LENGTH_SHORT).show();
-//                        mAuth.signOut();
-//                        Log.d(TAG, "sendEmailVerification: ");
-//                    }
-//                    mAuth.signOut();
-//
-//                }).addOnFailureListener(e -> {
-//                    Toast.makeText(context, "Email not sent! " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                    Log.d(TAG, "verifyUser: Auth_errror: " + e.getMessage());
-//                    mAuth.signOut();
-//
-//                });
-//            }
-//            return null;
-//
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> sendEmailVerification(@NonNull ActionCodeSettings actionCodeSettings) {
-//            return super.sendEmailVerification(actionCodeSettings);
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> verifyBeforeUpdateEmail(@NonNull String s) {
-//            return super.verifyBeforeUpdateEmail(s);
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Task<Void> verifyBeforeUpdateEmail(@NonNull String s, @Nullable ActionCodeSettings actionCodeSettings) {
-//            return super.verifyBeforeUpdateEmail(s, actionCodeSettings);
-//        }
-//
-//
-//        @NonNull
-//        @Override
-//        public String getUid() {
-//
-//            return current_F_user.getUid();
-//        }
-//
-//        @NonNull
-//        @Override
-//        public String getProviderId() {
-//            return current_F_user.getProviderId();
-//        }
-//
-//        @Override
-//        public boolean isAnonymous() {
-//            return current_F_user.isAnonymous();
-//        }
-//
-//        @Nullable
-//        @Override
-//        public List<String> zza() {
-//            return current_F_user.zza();
-//        }
-//
-//        @NonNull
-//        @Override
-//        public List<? extends UserInfo> getProviderData() {
-//
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public FirebaseUser zza(@NonNull List<? extends UserInfo> list) {
-//            return null;
-//        }
-//
-//        @Override
-//        public FirebaseUser zzb() {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public FirebaseApp zzc() {
-//            return null;
-//        }
-//
-//        @Nullable
-//        @Override
-//        public String getDisplayName() {
-//            return current_F_user.getDisplayName();
-//        }
-//
-//        @Nullable
-//        @Override
-//        public Uri getPhotoUrl() {
-//            return current_F_user.getPhotoUrl();
-//        }
-//
-//        @Nullable
-//        @Override
-//        public String getEmail() {
-//            return current_F_user.getEmail();
-//        }
-//
-//        @Nullable
-//        @Override
-//        public String getPhoneNumber() {
-//            return current_F_user.getPhoneNumber();
-//        }
-//
-//        @Override
-//        public boolean isEmailVerified() {
-//            return current_F_user.isEmailVerified();
-//        }
-//
-//        @Nullable
-//        @Override
-//        public String getTenantId() {
-////        return mUser.getTenantId();
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public zzff zzd() {
-//            return null;
-//        }
-//
-//        @Override
-//        public void zza(@NonNull zzff zzff) {
-//        }
-//
-//        @NonNull
-//        @Override
-//        public String zze() {
-//            return null;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public String zzf() {
-//            return null;
-//        }
-//
-//        @Nullable
-//        @Override
-//        public FirebaseUserMetadata getMetadata() {
-//            return current_F_user.getMetadata();
-//        }
-//
-//        @NonNull
-//        @Override
-//        public MultiFactor getMultiFactor() {
-//            return null;
-//        }
-//
-//        @Override
-//        public void zzb(List<MultiFactorInfo> list) {
-//
-//        }
-//
-//        @Override
-//        public void writeToParcel(Parcel dest, int flags) {
-//
-//        }
-//
-//    }
-
-//    public void signIn(@NonNull Activity activity, @NonNull String email, @NonNull String password) {
-//        Context context = activity.getApplicationContext();
-//        if (!email.isEmpty() && !password.isEmpty()) {
-//            myAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-//                        // if successful send email verification
-//                        if (task.isSuccessful()) {
-//                            Log.d(TAG, "login: successful: ");
-//                            if (task.getResult().getUser() != null) {
-//                                mCurrentUser = task.getResult().getUser();
-//                                // Todo> The User object has been made bellow. Pass it to the next activity or fragment. Sina's Note <That is not neccessary. we dont pass through intent but rather fetch it from Db in the other activity>
-//                            }
-//                        }
-//                    }
-//            ).addOnFailureListener(e -> {
-//                Log.d(TAG, "signIn: Failed: " + e.getMessage());
-//                signOut();
-//                mDatabase.goOffline();
-//                Toast.makeText(context, "Unable to reach the host. Check your Internet " + e.getMessage(), Toast.LENGTH_LONG).show();
-//            }).addOnCanceledListener(() -> {
-//                Log.d(TAG, "signIn: canceled");
-//                signOut();
-//                mDatabase.goOffline(); //Todo Mo's modifications. here we close the com.example.prototype1.auth and also the db server connection!
-//            });
-//        } else {
-//            Toast.makeText(context, "Type a valid email and password", Toast.LENGTH_LONG).show();
-//        }
-//    }
-//
-//    private void checkUserNumber(@NonNull DataSnapshot snapshot, @NonNull Context context) {
-//        Traveler mTraveler = new Traveler();
-//        for (DataSnapshot ds : snapshot.getChildren()) {
-//            User user1 = ds.getValue(User.class);
-//            Log.d(TAG, "onDataChange: user1: " + user1.getPhone());
-//            if (user1.getPhone().equals("no_phone")) {
-//                // TODO since we decided to always identify the phone with a message then always go to PhoneActivity
-//
-//                mTraveler.goToWithFlags(context, PhoneVerifyActivity.class);
-//            }
-//        }
-//
-//    }
 }

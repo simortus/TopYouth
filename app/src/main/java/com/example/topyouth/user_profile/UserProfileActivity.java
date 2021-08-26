@@ -10,7 +10,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -34,13 +33,12 @@ import com.example.topyouth.R;
 import com.example.topyouth.login.LoginActivity;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
-import com.example.topyouth.utility_classes.DBSingleton;
-import com.example.topyouth.utility_classes.MediaStuff;
+import com.example.topyouth.auth_database.DBSingleton;
+import com.example.topyouth.camera.MediaStuff;
 import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
-import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
+import com.example.topyouth.auth_database.FirebaseAuthSingleton;
 import com.example.topyouth.view_utils.GridImageAdapter;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -63,7 +61,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import static com.example.topyouth.utility_classes.MediaStuff.CAMERA_REQUEST;
+import static com.example.topyouth.camera.MediaStuff.CAMERA_REQUEST;
 
 public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "UserProfileActivity";
@@ -141,7 +139,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         gridView.setAdapter(adapter);
 
         //bottomNav handlers
-        bottomNavigationHandler = new BottomNavigationHandler(currentActvitiy, bottomNavigationView);
+        bottomNavigationHandler = BottomNavigationHandler.getInstance(this);
         bottomNavigationHandler.navigation();
         MenuItem userItem = bottomNavigationView.getMenu().getItem(2);
         userItem.setChecked(true);
@@ -257,12 +255,11 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
-
     }
 
 
     private void setUserInfo() {
-        final DatabaseReference userRef = database.getReference("users");
+        final DatabaseReference userRef = dbSingleton.getUsers_ref();
         final String user_id = mUser.getUid();
         Runnable runnable1 = this::setStatus;
         Runnable runnable2 = () -> {

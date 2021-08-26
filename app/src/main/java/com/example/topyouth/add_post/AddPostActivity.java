@@ -26,11 +26,11 @@ import com.example.topyouth.R;
 import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
-import com.example.topyouth.utility_classes.DBSingleton;
-import com.example.topyouth.utility_classes.MediaStuff;
+import com.example.topyouth.auth_database.DBSingleton;
+import com.example.topyouth.camera.MediaStuff;
 import com.example.topyouth.utility_classes.Traveler;
 import com.example.topyouth.view_utils.BottomNavigationHandler;
-import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
+import com.example.topyouth.auth_database.FirebaseAuthSingleton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -165,12 +165,11 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
 
         final String postOwnerID = mUser.getUid();
 
-        StorageReference ref = storage.getReference("posts");
-        String postID = UUID.randomUUID().toString();
+        final StorageReference ref = storage.getReference("posts");
+        final String postID = UUID.randomUUID().toString();
         progressDialog.show();
         ref.child(postOwnerID).child(postID).putFile(uri).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-
                 task.getResult().getStorage().getDownloadUrl().addOnCompleteListener(task1 -> {
                     if (task1.isSuccessful()) {
                         final String url = task1.getResult().toString();
@@ -212,8 +211,8 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
 
     private TopUser topUser() {
         final String userId = mUser.getUid();
-        DatabaseReference usersRef = database.getReference("users");
-        Query query = usersRef.child(userId);
+        final DatabaseReference usersRef = dbSingleton.getUsers_ref();
+        final Query query = usersRef.child(userId);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -281,7 +280,8 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
 
 
         //bottom navigation handler
-        bottomNavigationHandler = new BottomNavigationHandler(this, bottomNavigationView);
+//        bottomNavigationHandler = new BottomNavigationHandler(this);
+        bottomNavigationHandler = BottomNavigationHandler.getInstance(this);
         bottomNavigationHandler.navigation();
         bottomNavigationHandler.isAdminApproved(mUser, notApprovedLayout, userLayout);
         MenuItem addItem = bottomNavigationView.getMenu().getItem(1);
@@ -304,5 +304,8 @@ public class AddPostActivity extends AppCompatActivity implements View.OnClickLi
             mAuth.addAuthStateListener(mAuthStateListener);
         };
     }
+
+    // TODO: 8/24/21 add filter for users. If user has no name and no photo => make him identify himself.
+
 
 }

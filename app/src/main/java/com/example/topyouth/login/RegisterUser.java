@@ -1,7 +1,6 @@
 package com.example.topyouth.login;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -12,31 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.topyouth.R;
-import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
-import com.google.android.gms.tasks.Task;
-import com.google.common.base.Utf8;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
+import com.example.topyouth.auth_database.FirebaseAuthSingleton;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import static androidx.core.content.ContextCompat.getColor;
 import static com.example.topyouth.utility_classes.PasswordClassStuff.hasDigits;
 import static com.example.topyouth.utility_classes.PasswordClassStuff.hasSpecial;
 import static com.example.topyouth.utility_classes.PasswordClassStuff.isLongEnough;
@@ -83,14 +72,12 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
         pass.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                register_button.setEnabled(false);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count < 8) {
-                    register_button.setBackgroundColor(getResources().getColor(R.color.fade_grey));
-                    register_button.setTextColor(getResources().getColor(R.color.grey));
                     register_button.setEnabled(false);
                 }
             }
@@ -99,8 +86,6 @@ public class RegisterUser extends Fragment implements View.OnClickListener {
             public void afterTextChanged(Editable s) {
 
                 if (s.toString().length() >= 8) {
-                    register_button.setTextColor(getResources().getColor(R.color.blue_darkish));
-                    register_button.setBackground(getResources().getDrawable(R.drawable.button_design_selector_blue));
                     register_button.setEnabled(true);
                 }
             }

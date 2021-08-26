@@ -10,6 +10,7 @@
         android:background="@color/red">
 
         <TextView
+            android:id="@+id/toast_title_message"
             android:text="@string/you_are_offline"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@color/white"

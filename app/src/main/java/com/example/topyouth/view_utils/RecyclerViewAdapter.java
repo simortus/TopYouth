@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -29,12 +28,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.topyouth.R;
+import com.example.topyouth.molde.CommentReaction;
 import com.example.topyouth.molde.Comments;
 import com.example.topyouth.molde.Likes;
 import com.example.topyouth.molde.PostModel;
 import com.example.topyouth.molde.TopUser;
-import com.example.topyouth.utility_classes.DBSingleton;
-import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
+import com.example.topyouth.auth_database.DBSingleton;
+import com.example.topyouth.auth_database.FirebaseAuthSingleton;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -66,16 +66,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     //database
     private FirebaseUser currentUser;
     private FirebaseAuthSingleton singleton;
-    private DBSingleton dbSingleton = DBSingleton.getInstance();
-    private DatabaseReference postRef = dbSingleton.getPostsRef(),
+    private final DBSingleton dbSingleton = DBSingleton.getInstance();
+    private final DatabaseReference postRef = dbSingleton.getPostsRef(),
             userRef = dbSingleton.getUsers_ref(),
             commentRef = dbSingleton.getCommentsRef(),
             likeRef = dbSingleton.getLikesRef();
-
-    private FirebaseDatabase database = dbSingleton.getDbInstance();
-
     // threads
-    private ExecutorService executors = Executors.newCachedThreadPool();
+    private final ExecutorService executors = Executors.newCachedThreadPool();
+
+
+    private final List<TopUser> commentators = new ArrayList<>();
+    private final List<Comments> commentsList = new ArrayList<>();
+    private final List<CommentReaction> reactionList = new ArrayList<>();
+    private ListViewAdapter myadapter;
+    private PostModel currentPost;
 
 
     public RecyclerViewAdapter(@NonNull final Activity mContext, @NonNull List<PostModel> postsList,
@@ -93,8 +97,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         like_sign = mContext.getDrawable(R.drawable.like_sign_outlined);
         liked_sign = mContext.getDrawable(R.drawable.liked_icone);
 
-
-
         return new CardViewHolder(view);
     }
 
@@ -107,9 +109,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         singleton = FirebaseAuthSingleton.getInst(mContext);
         currentUser = singleton.mAuth().getCurrentUser();
-        if (postsList.size() > 0) {
-            PostModel currentPost = postsList.get(position);
-            if (postOwnerList.size() > 0) {
+        if (!postsList.isEmpty()) {
+            currentPost = postsList.get(position);
+            if (!postOwnerList.isEmpty()) {
                 TopUser user = postOwnerList.get(position);
                 String userName = user.getUsername(),
                         userProfile = user.getPhoto();
@@ -227,8 +229,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         CardViewHolder(@NonNull View itemView) {
             super(itemView);
             setupView(itemView);
-
-
         }
 
         private void setupView(View itemView) {
@@ -268,27 +268,23 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 case R.id.post_comments_number:
                     openCommentDisplay();
                     break;
-
             }
-
         }
 
 
         private void openCommentDisplay() {
             final View layoutView = mContext.getLayoutInflater().inflate(R.layout.comment_display_layout, null);
             final ListView listView = layoutView.findViewById(R.id.list_view);
-//            final Button doneButton = layoutView.findViewById(R.id.doneButton_dialog);
+            myadapter = new ListViewAdapter(mContext, commentsList, commentators, reactionList);
+            listView.setAdapter(myadapter);
 
-            final List<TopUser> commentators = new ArrayList<>();
-            final List<Comments> commentsList = new ArrayList<>();
-            final ListViewAdapter myadapter = new ListViewAdapter(mContext, commentsList, commentators);
 
             //Dialog constructor and setup
             final AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             final AlertDialog alertDialog = dialog.create();
             alertDialog.setCanceledOnTouchOutside(false);
 
-            WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
+            final WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
             wlp.windowAnimations = R.style.Widget_AppCompat_Light_ListPopupWindow;
             wlp.gravity = Gravity.CENTER;
             wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -296,13 +292,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
             dialog.setNegativeButton("Done", (dialogInterface, i) -> dialogInterface.dismiss());
-
-//            doneButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    alertDialog.dismiss();
-//                }
-//            });
 
             dialog.setView(layoutView);
 
@@ -312,24 +301,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             commentQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    commentsList.clear();
                     if (dataSnapshot.exists()) {
                         if (dataSnapshot.hasChildren()) {
                             for (DataSnapshot ds : dataSnapshot.getChildren()) {
                                 final String userId = ds.getKey();
                                 Log.d(TAG, "onDataChange: userId: " + userId);
-                                fetchUser(userId, commentators, myadapter);
+                                fetchUser(userId);
                                 for (DataSnapshot dss : ds.getChildren()) {
                                     final Comments comment = dss.getValue(Comments.class);
                                     commentsList.add(comment);
+                                    getCommentReaction(comment.getComment_id());
                                     Log.d(TAG, "onDataChange: commentSnapshot id: " + comment.getComment_id());
                                     Log.d(TAG, "onDataChange: commentSnapshot comment text: " + comment.getCommentText());
                                 }
                             }
-
-                            listView.setAdapter(myadapter);
                             myadapter.notifyDataSetChanged();
-
-
                         }
                     }
                 }
@@ -340,20 +327,71 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     alertDialog.dismiss();
                 }
             });
+//            getCommentReaction(postID);
             dialog.show();
-
 
         }
 
-        private void fetchUser(final String userId, List<TopUser> userList, ListViewAdapter adapter) {
+        private void getCommentReaction(@NonNull String commentId) {
+//             final Query query = commentsReactionsRef.child(commentId).orderByKey().equalTo(userId);
+            //need commentID
+            //userId
+            final Runnable getCommentReactionRunnable = () -> {
+                final DatabaseReference commentLikeRef = dbSingleton.getCommentsReactionsRef();
+                final Query commentReactionQuery = commentLikeRef.child(commentId).orderByKey();
+
+                commentReactionQuery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        reactionList.clear();
+                        if (dataSnapshot.exists()) {
+                            if (dataSnapshot.hasChildren()) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    Log.d(TAG, "getCommentReaction onDataChange: ds.Key: " + ds.getKey());
+                                    CommentReaction reaction = ds.getValue(CommentReaction.class);
+                                    Log.d(TAG, "getCommentReaction onDataChange: ds.Key: " + reaction.getComment_id());
+                                    Log.d(TAG, "getCommentReaction onDataChange: ds.Key: " + reaction.getReaction());
+                                    reactionList.add(reaction);
+//                                    for (DataSnapshot dss : ds.getChildren()) {
+//                                        CommentReaction reaction = dss.getValue(CommentReaction.class);
+//                                        Log.d(TAG, "getCommentReaction onDataChange: ds.Key: " + reaction.getComment_id());
+//                                        Log.d(TAG, "getCommentReaction onDataChange: ds.Key: " + reaction.getReaction());
+//                                        reactionList.add(reaction);
+//                                    }
+                                }
+                                myadapter.notifyDataSetChanged();
+                            } else {
+                                Log.d(TAG, "getCommentReaction onDataChange: ds.Key: " + dataSnapshot.exists());
+                            }
+//                        Log.d(TAG, "onDataChange: comment_id: " + dataSnapshot.getKey());
+//                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+//                            final CommentReaction reaction = ds.getValue(CommentReaction.class);
+//                            Log.d(TAG, "getCommentReaction onDataChange: comment_id: " + reaction.getComment_id());
+//                            Log.d(TAG, "getCommentReaction onDataChange: comment Reaction: " + reaction.getReaction());
+//                            reactionList.add(reaction);
+//                        }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d(TAG, "getCommentReaction onCancelled: databaseError: " + databaseError.getMessage());
+                    }
+                });
+            };
+            executors.execute(getCommentReactionRunnable);
+        }
+
+        private void fetchUser(final String userId) {
             final Query userQuery = userRef.child(userId);
             userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
+                        commentators.clear();
                         final TopUser currentuser = dataSnapshot.getValue(TopUser.class);
-                        userList.add(currentuser);
-                        adapter.notifyDataSetChanged();
+                        commentators.add(currentuser);
+                        myadapter.notifyDataSetChanged();
 
                     }
                 }
@@ -374,6 +412,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             final EditText commentEditText = layoutView.findViewById(R.id.commentLayout_edit_text);
             final AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             dialog.setView(layoutView);
+
             final AlertDialog alertDialog = dialog.create();
             WindowManager.LayoutParams wlp = alertDialog.getWindow().getAttributes();
             wlp.windowAnimations = R.style.MaterialAlertDialog_MaterialComponents_Title_Panel;
@@ -382,7 +421,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             alertDialog.getWindow().setAttributes(wlp);
             alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.getWindow().setBackgroundDrawable(mContext.getDrawable(R.drawable.round_edge_rectangle_button_recycler_view));
-//            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             alertDialog.show();
 
             sendButton.setOnClickListener(view1 -> {
@@ -464,8 +502,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             final String commentDate = new Date(System.currentTimeMillis()).toString();
             Log.d(TAG, "createComment: comment date: " + commentDate);
 
-            Runnable commentRun = () -> {
-                final Comments comment = new Comments(user_id, comment_id, commentDate, commentText);
+            final Runnable commentRun = () -> {
+                final Comments comment = new Comments(postID, user_id, comment_id, commentText, commentDate);
                 commentRef.child(postID).child(user_id).child(comment_id).setValue(comment).addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "onSuccess: comment added successfully");
                     Toast.makeText(mContext, "Comment added", Toast.LENGTH_SHORT).show();
@@ -483,19 +521,34 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
-    class ListViewAdapter extends ArrayAdapter<Comments> {
+    private class ListViewAdapter extends ArrayAdapter<Comments> {
         private static final String TAG = "ListViewAdapter";
 
+        //constructor parameters
         private final List<Comments> commentList;
         private final List<TopUser> commnters;
         private final Context mContext;
 
+        //view vars
+        private ImageButton likeButton, loveButton, dislikeButton;
+        private CircularImageView commenterProfile;
+        private TextView usernameTextView, commentTextView, commentDateTextView;
+        private Drawable liked, loved, disliked, like, love, dislike;
+
+        // setup vars
+        private List<CommentReaction> commentReactionList = new ArrayList<>();
+        private final String[] labels = {"like", "love", "dislike"};
+
+        private Comments currentComment;
+
         @SuppressLint("ResourceType")
-        public ListViewAdapter(@NonNull final Context context, final List<Comments> commentList, final List<TopUser> commenters) {
+        public ListViewAdapter(@NonNull final Context context, final List<Comments> commentList,
+                               final List<TopUser> commenters, final List<CommentReaction> reactionList) {
             super(context, R.layout.comment_display_layout, commentList);
             this.mContext = context;
             this.commentList = commentList;
             this.commnters = commenters;
+            this.commentReactionList = reactionList;
 
         }
 
@@ -510,18 +563,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             LayoutInflater inflater = LayoutInflater.from(mContext);
             final View viewHolder = inflater.inflate(R.layout.comment_layout_list, parent, false);
             // setup view
-            final CircularImageView commenterProfile = viewHolder.findViewById(R.id.commenter_profilePic);
-            final TextView usernameTextView = viewHolder.findViewById(R.id.username);
-            final TextView commentTextView = viewHolder.findViewById(R.id.comment_textView);
-            final TextView commentDateTextView = viewHolder.findViewById(R.id.comment_date);
+            setupView(viewHolder);
 
-            if (commentTextView == null) {
-                Log.d(TAG, "getView: what the fuck!");
-            }
 
             if (commentList.size() > 0) {
-
-                Comments currentComment = commentList.get(position);
+                // objects
+                currentComment = commentList.get(position);
                 Log.d(TAG, "getView: current comment: " + currentComment);
                 //setup comment details
                 final String comment = currentComment.getCommentText();
@@ -539,14 +586,183 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     }
                 }
 
+
             }
+
+            if (!commentReactionList.isEmpty()) {
+                for (CommentReaction cr : commentReactionList) {
+                    if (cr.getComment_id().equals(currentComment.getComment_id())) {
+                        if (currentUser.getUid().equals(cr.getUser_id())) {
+                            final String reaction = cr.getReaction();
+                            switch (reaction) {
+                                case "like":
+                                    likeButton.setImageDrawable(liked);
+                                    break;
+                                case "love":
+                                    loveButton.setImageDrawable(loved);
+                                    break;
+                                case "dislike":
+                                    dislikeButton.setImageDrawable(disliked);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            likeButton.setOnClickListener(v -> {
+                likeCurrentComment(currentComment, labels[0]);
+            });
+            loveButton.setOnClickListener(v -> {
+                likeCurrentComment(currentComment, labels[1]);
+            });
+            dislikeButton.setOnClickListener(v -> {
+                likeCurrentComment(currentComment, labels[2]);
+            });
             return viewHolder;
+        }
+
+        private void setupView(@NonNull View viewHolder) {
+            commenterProfile = viewHolder.findViewById(R.id.commenter_profilePic);
+            usernameTextView = viewHolder.findViewById(R.id.username);
+            commentTextView = viewHolder.findViewById(R.id.comment_textView);
+            commentDateTextView = viewHolder.findViewById(R.id.comment_date);
+
+            likeButton = viewHolder.findViewById(R.id.like_button);
+            loveButton = viewHolder.findViewById(R.id.loveButton);
+            dislikeButton = viewHolder.findViewById(R.id.dislikeButton);
+
+            //drawables
+            like = mContext.getDrawable(R.drawable.like_sign_outlined);
+            liked = mContext.getDrawable(R.drawable.liked_icone);
+            love = mContext.getDrawable(R.drawable.love_icone_empty);
+            loved = mContext.getDrawable(R.drawable.love_icone_filled);
+            dislike = mContext.getDrawable(R.drawable.dislike_empty);
+            disliked = mContext.getDrawable(R.drawable.dislike_icone_filled);
+        }
+
+        //tested and works fine
+        private void likeCurrentComment(@NonNull Comments comment, @NonNull final String reaction) {
+            final String postId = comment.getPostId();
+            final String userId = currentUser.getUid();
+            final String commentId = comment.getComment_id();
+            Log.d(TAG, "likeCurrentComment: currentUser= " + userId);
+            Log.d(TAG, "likeCurrentComment: currentCommentID= " + commentId);
+            final DatabaseReference commentsReactionsRef = dbSingleton.getCommentsReactionsRef();
+            final Runnable commentReactionRunnable = () -> {
+                final Query query = commentsReactionsRef.child(commentId).orderByKey().equalTo(userId);
+                final CommentReaction commentReaction = new CommentReaction(postId, userId, commentId, reaction);
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+                            commentsReactionsRef.child(commentId).child(userId).setValue(commentReaction).addOnSuccessListener(aVoid -> {
+                                commentReactionList.add(commentReaction);
+                                Log.d(TAG, "onSuccess: successfully added");
+                                Toast.makeText(mContext, "Success", Toast.LENGTH_SHORT).show();
+                                switch (reaction) {
+                                    case "like":
+                                        likeButton.setImageDrawable(liked);
+                                        break;
+                                    case "love":
+                                        loveButton.setImageDrawable(loved);
+                                        break;
+                                    case "dislike":
+                                        dislikeButton.setImageDrawable(disliked);
+                                        break;
+                                }
+
+                            }).addOnFailureListener(e -> {
+                                Log.d(TAG, "likeCurrentComment onFailure: failed: " + e.getMessage());
+                            });
+                        } else {
+                            removeLike(postId, commentId, reaction);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d(TAG, "likeCurrentComment onCancelled: databaseError: " + databaseError.getMessage());
+                    }
+                });
+            };
+            executors.execute(commentReactionRunnable);
+
+        }
+
+        //tested and works fine
+        private void removeLike(@NonNull String postId, @NonNull String comId, @NonNull String react) {
+            final DatabaseReference commentLikeRef = dbSingleton.getCommentsReactionsRef();
+            final String userId = currentUser.getUid();
+            final CommentReaction commentReaction = new CommentReaction(postId, userId, comId, react);
+
+            commentLikeRef.child(comId).child(userId).removeValue().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    commentReactionList.remove(commentReaction);
+                    Log.d(TAG, "removeLike: task is successful: " + task.isSuccessful());
+                    switch (react) {
+                        case "like":
+                            likeButton.setImageDrawable(like);
+                            Log.d(TAG, "removeLike: like removed: " + task.isSuccessful());
+                            break;
+                        case "love":
+                            loveButton.setImageDrawable(love);
+                            Log.d(TAG, "removeLike: love removed: " + task.isSuccessful());
+                            break;
+                        case "dislike":
+                            dislikeButton.setImageDrawable(dislike);
+                            Log.d(TAG, "removeLike: dislike removed: " + task.isSuccessful());
+                            break;
+                    }
+
+                }
+            }).addOnFailureListener(e ->
+                    Log.d(TAG, "removeLike onFailure: Exception: " + e.getMessage()));
         }
     }
 
 
 }
-
+//            commentQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    if (!dataSnapshot.exists()) {
+//                        final CommentReaction commentReaction = new CommentReaction(commentId, userId, reaction);
+//                        commentsRef.child(commentId).child(userId).setValue(commentReaction).addOnSuccessListener(aVoid -> {
+//                            Log.d(TAG, "likeCurrentComment onSuccess: ");
+//                            Toast.makeText(mContext, "Comment liked successfully", Toast.LENGTH_SHORT).show();
+//                            reactionList.add(commentReaction);
+//                            myadapter.notifyDataSetChanged();
+//                            switch (reaction) {
+//                                case "like":
+//                                    likeButton.setImageDrawable(liked);
+//                                    break;
+//                                case "love":
+//                                    loveButton.setImageDrawable(loved);
+//                                    break;
+//                                case "dislike":
+//                                    dislikeButton.setImageDrawable(disliked);
+//                                    break;
+//                            }
+//                        }).addOnFailureListener(e -> {
+//                            Log.d(TAG, "likeCurrentComment onFailure: Exception: " + e.getMessage());
+//
+//                        });
+//                    } else {
+//                        final CommentReaction commentReaction = dataSnapshot.getValue(CommentReaction.class);
+//                        Log.d(TAG, "onDataChange: commentReaction.commentId: " + commentReaction.getComment_id());
+//                        Log.d(TAG, "onDataChange: commentReaction.reaction: " + commentReaction.getReaction());
+//                        removeLike(commentReaction);
+//                    }
+//                }
+//
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                    Log.d(TAG, "likeCurrentComment onCancelled: DatabaseError: " + databaseError.getMessage());
+//                }
+//            });
 
 //        private void bundleFunctionality(Fragment livingConditions) {
 //            Bundle bundle = new Bundle();

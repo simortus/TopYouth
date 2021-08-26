@@ -2,14 +2,12 @@ package com.example.topyouth.login;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -20,7 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.topyouth.R;
-import com.example.topyouth.utility_classes.FirebaseAuthSingleton;
+import com.example.topyouth.auth_database.FirebaseAuthSingleton;
+import com.example.topyouth.home.MainActivity;
+import com.example.topyouth.utility_classes.Toaster;
 import com.example.topyouth.utility_classes.Traveler;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -51,12 +51,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Traveler traveler = new Traveler();
     private MessageDigest hashAlgo;
     private AccessibilityService.SoftKeyboardController keyboardController;
+    private Toaster toaster;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
         mContext = getApplicationContext();
+        toaster = new Toaster(this);
         fragmentManager = getSupportFragmentManager();
         try {
             hashAlgo = MessageDigest.getInstance("SHA-256");
@@ -78,8 +80,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count < 8) {
                     button_login.setEnabled(false);
-                }
-                else button_login.setEnabled(true);
+                } else button_login.setEnabled(true);
             }
 
             @Override
@@ -93,14 +94,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void connectFirebase() {
         authSingleton = FirebaseAuthSingleton.getInst(this);
-        if (authSingleton.checkInternetConnection()){
+        if (authSingleton.checkInternetConnection()) {
             mAuth = authSingleton.mAuth();
             mUser = authSingleton.getCurrentUser();
+            if (mAuth != null && authSingleton.isUserCompliant(mUser)) {
+                traveler.gotoWithFlags(this, MainActivity.class);
+            } else {
+                authSingleton.signOut();
+            }
+        } else {
+            toaster.displayNoConnectionMessage();
         }
-        else {
-            Toast.makeText(mContext,"Please check your internet connection",Toast.LENGTH_SHORT).show();
-        }
-
 
 
     }
@@ -149,7 +153,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final String pass = et_pass.getText().toString();
         final byte[] passEncoded = hashAlgo.digest(pass.getBytes());
         final String p = new String(passEncoded);
-        final View view = getCurrentFocus();
         traveler.hideKeyboard(getCurrentFocus(), mContext);
         if (authSingleton.checkInternetConnection()) {
 
@@ -158,14 +161,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else
                 Toast.makeText(mContext, "Please provide the needed credentials.", Toast.LENGTH_SHORT).show();
         } else {
-            Toast toast = Toast.makeText(mContext,null,Toast.LENGTH_SHORT);
-            View view1 = getLayoutInflater().inflate(R.layout.offline_layout,null);
-            view1.setX(0);
-            view1.setY(0);
-            toast.setView(view1);
-            toast.show();
-//            Toast.makeText(mContext, R.string.check_internet, Toast.LENGTH_SHORT).show();//<-Notify user to check internet-->
-
+            toaster.displayNoConnectionMessage();
         }
 
     }
@@ -182,80 +178,5 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart() {
         super.onStart();
-        if (mAuth != null && authSingleton.isUserCompliant(mUser)) {
-            authSingleton.checkApproved();
-        } else {
-            authSingleton.signOut();
-        }
     }
-
-
-//    private void addAuthListener() {
-//        try {
-//            mAuthStateListener = firebaseAuth -> {
-//                    mAuthStateListener.onAuthStateChanged(firebaseAuth);
-//
-//            };
-//        } catch (Exception e) {
-//            Log.d(TAG, "addAuthListener: error: " + e.getLocalizedMessage());
-//        }
-//
-//    }
-
-//    private void addUserToDataBase() {
-//        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-//        final String nodeID = user_ref.child(firebaseUser.getUid()).getKey();
-//        final String userId = firebaseUser.getUid();
-//        final String userMail = firebaseUser.getEmail();
-//        final User user = new User(userId, userMail, "no_name", "no_photo",
-//                "no_about", "no_profession");
-//
-//        Query query = user_ref.
-//                orderByKey().equalTo(nodeID);
-//
-//        query.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (!dataSnapshot.exists()){
-//                    addNewUser(user);
-//                }
-//
-////                if (dataSnapshot.hasChildren() && !dataSnapshot.getKey().contains(userId)){
-////                    addNewUser(user);
-////                    Log.d(TAG, "addUserToDataBase: User: " + user.toString() + "added successfully\n");
-//////                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
-//////                        if (!ds.getKey().equals(userId)) {
-//////                            addNewUser(user);
-//////                            Log.d(TAG, "addUserToDataBase: User: " + user.toString() + "added successfully\n");
-//////                            return;
-//////                        }
-//////                    }
-////                }
-////                else {
-////                    user_ref.child(userId).setValue(user);
-////                }
-////                if (!dataSnapshot.getKey().contains(userId)) {
-////                    Log.d(TAG, "onDataChange: datasnapshot: "+dataSnapshot.getKey());
-////                    addNewUser(user);
-////                    Log.d(TAG, "addUserToDataBase:  user successfully added" + userMail);
-////                }
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Toast.makeText(mContext, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, "databaseError: " + databaseError.getMessage());
-//            }
-//        });
-//
-//    }
-
-//    private void addNewUser(User user) {
-//        myRef.child("users")
-//                .child(user.getUserId())
-//                .setValue(user);
-//    }
-
-
 }

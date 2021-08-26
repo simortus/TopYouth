@@ -16,6 +16,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/camera_item"
             android:clickable="true"
+            android:tag="@string/cam"
             android:focusable="true"
             android:layout_marginStart="?actionBarSize"
             android:background="@drawable/white_rectangle_white_backg_sharpe_edge"
@@ -27,6 +28,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/gallery_item"
+            android:tag="@string/gallery"
             android:clickable="true"
             android:focusable="true"
             android:layout_below="@id/camera_item"

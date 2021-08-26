@@ -12,6 +12,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nothing_to_display"
+            android:layout_centerInParent="true"
+            android:fontFamily="@font/arimo"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/red"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:visibility="invisible"
+            android:elevation="5dp"
+            android:text="@string/nothing_to_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </androidx.appcompat.widget.AppCompatTextView>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewer"
             android:layout_width="match_parent"

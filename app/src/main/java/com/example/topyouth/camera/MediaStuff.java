@@ -1,4 +1,4 @@
-package com.example.topyouth.utility_classes;
+package com.example.topyouth.camera;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,7 +29,7 @@ public class MediaStuff {
     private final Activity activity;
     private Uri mUri;
 
-    private static String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private final static String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     public MediaStuff(@NonNull Activity activity) {
         this.activity = activity;
@@ -54,23 +54,23 @@ public class MediaStuff {
      * Open camera
      */
     public void takePicture() {
-        ContentValues values = new ContentValues();
+        final ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, "NEW PICTURE");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "From the camerea");
-        this.mUri = this.activity.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From the camera");
+        this.mUri = activity.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        final Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-        this.activity.startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        activity.startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
 
     /**
      * Open phone gallery
      */
     public void selectPicture() {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        final Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         photoPickerIntent.setType("image/*");
         photoPickerIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-        this.activity.startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+        activity.startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
     }
 
     /**
@@ -110,21 +110,7 @@ public class MediaStuff {
 
 
         alertDialog.show();
-//        final CharSequence[] options = {"Camera", "Gallery", "Cancel"};
-//        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-//        builder.setTitle("Add media");
-//        builder.setIcon(R.mipmap.top_youth_logo_icone);
-//        builder.setItems(options, (dialog, which) -> {
-//            if (options[which].equals("CAMERA")) {
-//                takePicture();
-//            } else if (options[which].equals("GALLERY")) {
-//                selectPicture();
-//            } else if (options[which].equals("CANCEL")) {
-//                dialog.dismiss();
-//            }
-//
-//        });
-//        builder.show();
+
     }
 
 }

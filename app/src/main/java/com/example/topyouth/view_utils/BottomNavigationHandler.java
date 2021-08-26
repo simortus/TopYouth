@@ -8,15 +8,19 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.topyouth.R;
 import com.example.topyouth.add_post.AddPostActivity;
 import com.example.topyouth.home.MainActivity;
 import com.example.topyouth.user_profile.UserProfileActivity;
 import com.example.topyouth.utility_classes.Traveler;
+import com.google.android.gms.tasks.SuccessContinuation;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.ExecutorService;
@@ -25,24 +29,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BottomNavigationHandler extends BottomNavigationView {
     private static final String TAG = "BottomNavigationHandler";
-    private BottomNavigationView navigationView;
-    private Activity context;
-    private Traveler traveler = new Traveler();
+    private final BottomNavigationView navigationView;
+    private final Activity context;
+    private final Traveler traveler = new Traveler();
 
     private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
 
-    public BottomNavigationHandler(@NonNull Activity context, BottomNavigationView bnv) {
+    private BottomNavigationHandler(@NonNull Activity context) {
         super(context);
         this.context = context;
-        this.navigationView = bnv;
+        this.navigationView = context.findViewById(R.id.bottomNavigationBar);
         navigationView.setItemHorizontalTranslationEnabled(true);
+        navigationView.setVerticalFadingEdgeEnabled(true);
     }
 
-    @SuppressLint("NonConstantResourceId")
+    public static BottomNavigationHandler getInstance(@NonNull Activity callingActivity) {
+        return new BottomNavigationHandler(callingActivity);
+    }
+
     public void navigation() {
         navigationView.setOnNavigationItemSelectedListener(item -> {
             final String activityClassNAme = context.getLocalClassName();
-            Log.d(TAG, "navigation: activityClassNAme: "+activityClassNAme);
+            Log.d(TAG, "navigation: activityClassNAme: " + activityClassNAme);
             switch (item.getItemId()) {
                 case R.id.home_icone:
                     navigationView.getMenu().getItem(0).setIcon(R.drawable.home_selected);
@@ -77,8 +85,7 @@ public class BottomNavigationHandler extends BottomNavigationView {
     }
 
     public void isAdminApproved(@NonNull final FirebaseUser mUser, @NonNull final RelativeLayout notApprovedLayout, @NonNull final RelativeLayout userLayout) {
-        ExecutorService executors = Executors.newCachedThreadPool();
-        Runnable isApproved = () -> {
+
             try {
                 final String user_id = mUser.getUid();
                 DocumentReference not_approved_users = mFirestore.collection("app_us").document(user_id);
@@ -107,15 +114,6 @@ public class BottomNavigationHandler extends BottomNavigationView {
             } catch (Exception e) {
                 Log.d(TAG, "isAdminApproved_Exception: " + e.getLocalizedMessage());
             }
-        };
-        synchronized (this) {
-            try {
-                this.wait(500);
-                executors.execute(isApproved);
-            } catch (InterruptedException e) {
-                Log.d(TAG, "isAdminApproved: Exeception: " + e.getMessage());
-            }
-        }
     }
 
 

@@ -24,24 +24,28 @@ public class TopUser implements  Serializable {
 
     public TopUser() {}
 
+    public TopUser(@NonNull String userId) {
+        this.userId = userId;
+    }
+
     public String getUserId() {
-        return userId;
+        return this.userId;
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public String getPhoto() {
-        return photo;
+        return this.photo;
     }
 
     public String getAbout() {
-        return about;
+        return this.about;
     }
 
     @NonNull

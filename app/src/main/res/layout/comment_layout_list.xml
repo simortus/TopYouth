@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -50,6 +51,48 @@
                 android:hint="@string/ipsum_lorem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/like_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="@android:dimen/app_icon_size"
+            android:layout_height="@android:dimen/app_icon_size"
+            android:layout_below="@id/comment_date"
+            android:layout_marginEnd="@android:dimen/app_icon_size"
+            android:layout_toStartOf="@id/loveButton"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:fontFamily="@font/arimo"
+            android:onClick="onClick"
+            android:src="@drawable/like_sign_outlined" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/loveButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="@android:dimen/app_icon_size"
+            android:layout_height="@android:dimen/app_icon_size"
+            android:layout_below="@id/comment_date"
+            android:elevation="10dp"
+            android:layout_centerHorizontal="true"
+            android:focusable="true"
+            android:fontFamily="@font/arimo"
+            android:onClick="onClick"
+            android:src="@drawable/love_icone_empty" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/dislikeButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="@android:dimen/app_icon_size"
+            android:layout_height="@android:dimen/app_icon_size"
+            android:layout_below="@id/comment_date"
+            android:elevation="10dp"
+            android:layout_toEndOf="@id/loveButton"
+            android:layout_marginStart="@android:dimen/app_icon_size"
+            android:focusable="true"
+            android:fontFamily="@font/arimo"
+            android:onClick="onClick"
+            android:src="@drawable/dislike_empty" />
+
 
     </RelativeLayout>
 

@@ -60,4 +60,7 @@
     <string name="send">Send</string>
     <string name="reset_your_password">Reset your password</string>
     <string name="you_are_offline">No internet connection detected!</string>
+    <string name="gallery">Gallery</string>
+    <string name="cam">Camera</string>
+    <string name="nothing_to_display">Nothing to display</string>
 </resources>
